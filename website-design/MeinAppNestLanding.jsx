@@ -1,7 +1,7 @@
 /**
- * DynStore — Landing Page
+ * MeinAppNest — Landing Page
  * ------------------------------------------------------------------
- * Single-file React landing page for DynStore ("Self-hosted Power.
+ * Single-file React landing page for MeinAppNest ("Self-hosted Power.
  * Ohne den Self-hosting Stress.").
  *
  * Stack:
@@ -10,7 +10,7 @@
  *   - Framer Motion (subtle reveals + microinteractions)
  *   - lucide-react (line icons)
  *
- * Design system: see DynStore-Website-Konzept.md (Cyan/Teal on deep dark).
+ * Design system: see MeinAppNest-Website-Konzept.md (Cyan/Teal on deep dark).
  * Exact brand colors live in the `C` palette object below and are applied
  * via inline styles so the file renders identically with or without a
  * custom Tailwind theme. In a production project you'd move these into
@@ -276,14 +276,14 @@ const PROBLEMS = [
 const STEPS = [
   { n: "01", icon: Search, t: "App oder Stack wählen", d: "Stöbere im Store und wähle, was du brauchst." },
   { n: "02", icon: Boxes, t: "Account erstellen", d: "In Sekunden registriert — keine Kreditkarte nötig." },
-  { n: "03", icon: Cpu, t: "DynStore provisioniert", d: "Wir richten Instanz, SSL & Domain automatisch ein." },
+  { n: "03", icon: Cpu, t: "MeinAppNest provisioniert", d: "Wir richten Instanz, SSL & Domain automatisch ein." },
   { n: "04", icon: Gauge, t: "Zugriff übers Dashboard", d: "Zugangsdaten erhalten, alles an einem Ort." },
   { n: "05", icon: Check, t: "Einfach nutzen", d: "Loslegen — wir kümmern uns um den Betrieb." },
 ];
 
 const COMPARE = [
   { f: "Einrichtungszeit", self: "Stunden–Tage", vps: "Stunden", dyn: "< 60 Sekunden" },
-  { f: "Wartung & Betrieb", self: "Du", vps: "Du", dyn: "DynStore" },
+  { f: "Wartung & Betrieb", self: "Du", vps: "Du", dyn: "MeinAppNest" },
   { f: "Updates", self: "Manuell", vps: "Manuell", dyn: "Automatisch" },
   { f: "Backups", self: "Selbst bauen", vps: "Selbst bauen", dyn: "Inklusive" },
   { f: "SSL / HTTPS", self: "Selbst konfigurieren", vps: "Selbst konfigurieren", dyn: "Automatisch" },
@@ -299,15 +299,15 @@ const METRICS = [
 ];
 
 const FAQS = [
-  { q: "Was ist DynStore?", a: "DynStore ist eine Plattform für fertig gehostete Self-Hosted-Apps. Du wählst eine App oder einen Stack, buchst sie und bekommst eine vollständig eingerichtete, sichere und aktuelle Instanz — ohne dich um Server, Docker, Updates oder Konfiguration kümmern zu müssen." },
-  { q: "Brauche ich technische Kenntnisse?", a: "Nein. Wenn du eine Web-App im Browser bedienen kannst, kannst du DynStore nutzen. Die gesamte Technik darunter — Server, Reverse Proxy, SSL, Updates — übernehmen wir." },
+  { q: "Was ist MeinAppNest?", a: "MeinAppNest ist eine Plattform für fertig gehostete Self-Hosted-Apps. Du wählst eine App oder einen Stack, buchst sie und bekommst eine vollständig eingerichtete, sichere und aktuelle Instanz — ohne dich um Server, Docker, Updates oder Konfiguration kümmern zu müssen." },
+  { q: "Brauche ich technische Kenntnisse?", a: "Nein. Wenn du eine Web-App im Browser bedienen kannst, kannst du MeinAppNest nutzen. Die gesamte Technik darunter — Server, Reverse Proxy, SSL, Updates — übernehmen wir." },
   { q: "Kann ich meine eigene Domain nutzen?", a: "Ja. Jede Instanz erhält automatisch eine eigene Subdomain mit HTTPS. Eine eigene Domain verbindest du in wenigen Klicks; wir richten das passende Zertifikat automatisch ein." },
-  { q: "Wie schnell ist eine App bereit?", a: "In der Regel in unter 60 Sekunden. Nach der Buchung provisioniert DynStore die Instanz automatisch und schickt dir die Zugangsdaten." },
+  { q: "Wie schnell ist eine App bereit?", a: "In der Regel in unter 60 Sekunden. Nach der Buchung provisioniert MeinAppNest die Instanz automatisch und schickt dir die Zugangsdaten." },
   { q: "Was passiert bei Updates?", a: "Updates und Sicherheits-Patches spielen wir automatisch ein, schonend und getestet. Du musst nichts tun — und kannst bei größeren Versionssprüngen optional informiert werden." },
   { q: "Kann ich Apps kombinieren?", a: "Ja. Du kannst mehrere Apps einzeln buchen oder einen vorkonfigurierten Stack wählen, in dem die Apps bereits miteinander verbunden sind (z. B. Radarr + Prowlarr + Jellyfin)." },
   { q: "Gibt es Backups?", a: "Ja. Deine Daten werden regelmäßig und verschlüsselt gesichert. Im Notfall stellen wir wieder her — Backups sind in jedem Plan enthalten." },
   { q: "Kann ich später wechseln oder kündigen?", a: "Jederzeit. Du kannst Pläne upgraden, downgraden oder monatlich kündigen. Beim Kündigen kannst du deine Daten vorher exportieren." },
-  { q: "Ist DynStore legal?", a: "DynStore stellt ausschließlich die Hosting-Infrastruktur und die Software bereit. Welche Inhalte du mit den Apps verarbeitest oder speicherst, liegt in deiner Verantwortung — wie bei jedem anderen Hosting-Anbieter." },
+  { q: "Ist MeinAppNest legal?", a: "MeinAppNest stellt ausschließlich die Hosting-Infrastruktur und die Software bereit. Welche Inhalte du mit den Apps verarbeitest oder speicherst, liegt in deiner Verantwortung — wie bei jedem anderen Hosting-Anbieter." },
   { q: "Wofür bin ich als Nutzer selbst verantwortlich?", a: "Für deine Inhalte und Daten, deine Zugangsdaten und die rechtmäßige Nutzung der Apps. Wir kümmern uns um Betrieb, Updates, Infrastruktur-Sicherheit, Backups und Verfügbarkeit." },
 ];
 
@@ -509,7 +509,7 @@ function HeroVisual() {
 /* ------------------------------------------------------------------ */
 /* Page                                                                */
 /* ------------------------------------------------------------------ */
-export default function DynStoreLanding() {
+export default function MeinAppNestLanding() {
   const [cat, setCat] = useState("Alle");
   const [query, setQuery] = useState("");
   const [yearly, setYearly] = useState(false);
@@ -538,7 +538,7 @@ export default function DynStoreLanding() {
             <span className="flex h-8 w-8 items-center justify-center rounded-lg" style={{ background: C.gradient }}>
               <Layers size={18} style={{ color: C.onAccent }} />
             </span>
-            DynStore
+            MeinAppNest
           </div>
           <nav className="hidden items-center gap-7 text-sm md:flex" style={{ color: C.textSecondary }}>
             {nav.map(([t, h]) => (
@@ -622,7 +622,7 @@ export default function DynStoreLanding() {
         id="how"
         eyebrow={<Eyebrow>Die Lösung</Eyebrow>}
         title="Dieselben Tools. Ohne den Betrieb."
-        subtitle="In wenigen Schritten von der Auswahl zur laufenden App — den Rest übernimmt DynStore."
+        subtitle="In wenigen Schritten von der Auswahl zur laufenden App — den Rest übernimmt MeinAppNest."
       >
         <div className="relative grid gap-4 sm:grid-cols-3 lg:grid-cols-5">
           <div className="absolute left-0 right-0 top-7 hidden h-px lg:block" style={{ background: C.borderSubtle }} />
@@ -770,7 +770,7 @@ export default function DynStoreLanding() {
       {/* ---------------- Comparison ---------------- */}
       <Section
         eyebrow={<Eyebrow>Vergleich</Eyebrow>}
-        title="Warum DynStore statt Server selbst betreiben?"
+        title="Warum MeinAppNest statt Server selbst betreiben?"
         subtitle="Dieselben Apps — aber ohne die Arbeit drumherum."
       >
         <Reveal className="overflow-x-auto">
@@ -779,7 +779,7 @@ export default function DynStoreLanding() {
               <div className="p-4" style={{ color: C.textMuted }}>Merkmal</div>
               <div className="p-4 text-center" style={{ color: C.textSecondary }}>Selbst hosten</div>
               <div className="p-4 text-center" style={{ color: C.textSecondary }}>Klassischer VPS</div>
-              <div className="p-4 text-center" style={{ color: C.accent, background: C.accentSoft }}>DynStore</div>
+              <div className="p-4 text-center" style={{ color: C.accent, background: C.accentSoft }}>MeinAppNest</div>
             </div>
             {COMPARE.map((row, i) => (
               <div key={row.f} className="grid grid-cols-4 text-sm" style={{ background: i % 2 ? "rgba(255,255,255,0.015)" : "transparent", borderTop: `1px solid ${C.borderSubtle}` }}>
@@ -930,7 +930,7 @@ export default function DynStoreLanding() {
                 <span className="flex h-8 w-8 items-center justify-center rounded-lg" style={{ background: C.gradient }}>
                   <Layers size={18} style={{ color: C.onAccent }} />
                 </span>
-                DynStore
+                MeinAppNest
               </div>
               <p className="mt-3 max-w-xs text-sm" style={{ color: C.textSecondary }}>
                 Deine Lieblings-Apps. Fertig gehostet.<br />Tools starten statt Server warten.
@@ -956,7 +956,7 @@ export default function DynStoreLanding() {
             ))}
           </div>
           <div className="mt-10 flex flex-col items-center justify-between gap-3 border-t pt-6 text-xs sm:flex-row" style={{ borderColor: C.borderSubtle, color: C.textMuted }}>
-            <span>© {new Date().getFullYear()} DynStore. Alle Rechte vorbehalten.</span>
+            <span>© {new Date().getFullYear()} MeinAppNest. Alle Rechte vorbehalten.</span>
             <span>Made for Power-User, Teams &amp; Creator · EU-Hosting</span>
           </div>
         </div>

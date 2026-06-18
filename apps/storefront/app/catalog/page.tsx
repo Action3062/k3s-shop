@@ -3,7 +3,7 @@ import { AppCard } from "@/components/AppCard";
 
 const AVAILABLE = new Set(["vaultwarden"]);
 
-export const metadata = { title: "Apps — DynStore" };
+export const metadata = { title: "Apps — MeinAppNest" };
 
 export default async function Catalog() {
   const catalog = await getCatalog();

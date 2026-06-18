@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.1.0",
   "type": "module",
-  "description": "DynStore marketing landing page — Vite + React + Tailwind + Framer Motion (dark mode).",
+  "description": "MeinAppNest marketing landing page — Vite + React + Tailwind + Framer Motion (dark mode).",
   "scripts": {
     "dev": "vite",
     "build": "vite build",

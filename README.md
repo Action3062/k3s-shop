@@ -1,4 +1,4 @@
-# DynStore
+# MeinAppNest
 
 > Self-service Multi-Tenant-Hosting-Plattform (ElfHosted-Stil) auf einem bestehenden **k3s**-HA-Cluster bei Hetzner. Kunden abonnieren im Store eine self-hosted App und erhalten wenige Minuten später eine laufende, isolierte Instanz unter `https://<username>.<appname>.meinappnest.org` — inklusive eigener Subdomain und HTTPS.
 
@@ -6,7 +6,7 @@
 
 ---
 
-## Was DynStore tut
+## Was MeinAppNest tut
 
 1. Kunde besucht den Store (`store.meinappnest.org`), wählt eine App, registriert sich.
 2. Kunde abonniert (Stripe Checkout).

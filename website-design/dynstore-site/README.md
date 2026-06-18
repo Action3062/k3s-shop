@@ -1,6 +1,6 @@
-# DynStore — Landingpage
+# MeinAppNest — Landingpage
 
-Lauffähige Marketing-Landingpage für **DynStore** (*„Self-hosted Power. Ohne den Self-hosting Stress."*).
+Lauffähige Marketing-Landingpage für **MeinAppNest** (*„Self-hosted Power. Ohne den Self-hosting Stress."*).
 Gebaut mit **Vite + React + Tailwind CSS + Framer Motion**, Dark Mode als Standard.
 
 ## Schnellstart
@@ -34,10 +34,10 @@ dynstore-site/
 ├─ src/
 │  ├─ main.jsx             # Entry
 │  ├─ index.css            # Tailwind-Direktiven + Utilities + Base
-│  └─ DynStoreLanding.jsx  # komplette Landingpage (alle Sektionen)
+│  └─ MeinAppNestLanding.jsx  # komplette Landingpage (alle Sektionen)
 ```
 
 ## Hinweise
 - Preise sind **Platzhalter** — vor Launch durch reale Werte ersetzen.
-- App-/Bundle-/FAQ-Inhalte stehen als Arrays oben in `DynStoreLanding.jsx` und sind leicht editierbar.
-- Konzept & Designsystem: siehe `../DynStore-Website-Konzept.md`.
+- App-/Bundle-/FAQ-Inhalte stehen als Arrays oben in `MeinAppNestLanding.jsx` und sind leicht editierbar.
+- Konzept & Designsystem: siehe `../MeinAppNest-Website-Konzept.md`.

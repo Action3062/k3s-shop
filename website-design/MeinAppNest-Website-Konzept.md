@@ -1,23 +1,23 @@
-# DynStore — Website-Design-Konzept
+# MeinAppNest — Website-Design-Konzept
 
 > **Positionierung:** Ein App Store für Self-Hosted Tools, kombiniert mit Managed Cloud Hosting und einem eleganten Kontrollzentrum.
 > **Zentrale Botschaft:** *Self-hosted Power. Ohne den Self-hosting Stress.*
 > **Akzentwelt:** Cyan / Teal auf tiefem, kühlem Dunkel — „cloud-native Control Center".
 
-Dieses Dokument ist als Übergabe an Designer:in **und** Entwickler:in gedacht. Teil 1–6 = Konzept & Texte. Der lauffähige React-Code wird separat als `DynStoreLanding.jsx` geliefert.
+Dieses Dokument ist als Übergabe an Designer:in **und** Entwickler:in gedacht. Teil 1–6 = Konzept & Texte. Der lauffähige React-Code wird separat als `MeinAppNestLanding.jsx` geliefert.
 
 ---
 
 ## 1. Visuelle Designrichtung
 
 ### Gesamtlook
-DynStore sieht aus wie ein **modernes Control Center für gehostete Apps** — ruhig, präzise, technisch, vertrauenswürdig. Die Oberfläche ist dunkel und „cloud-native", aber nie laut: keine Neon-Übersättigung, kein Crypto-Glanz, kein Gaming-RGB. Stattdessen tiefe, kühle Flächen, viel Negativraum, scharfe Typografie und sparsame, leuchtende Cyan-Akzente, die wie *Live-Status-Signale* wirken. Das Vorbild ist die Präzision von Linear, Vercel, Railway, Raycast und Supabase — eigenständig für DynStore interpretiert.
+MeinAppNest sieht aus wie ein **modernes Control Center für gehostete Apps** — ruhig, präzise, technisch, vertrauenswürdig. Die Oberfläche ist dunkel und „cloud-native", aber nie laut: keine Neon-Übersättigung, kein Crypto-Glanz, kein Gaming-RGB. Stattdessen tiefe, kühle Flächen, viel Negativraum, scharfe Typografie und sparsame, leuchtende Cyan-Akzente, die wie *Live-Status-Signale* wirken. Das Vorbild ist die Präzision von Linear, Vercel, Railway, Raycast und Supabase — eigenständig für MeinAppNest interpretiert.
 
 ### Farbwelt
 Dunkler, leicht ins Blaue gezogener Grund (kein reines Schwarz, kein Grau-Einheitsbrei). Darüber abgestufte „Surface"-Ebenen, die Tiefe erzeugen. Akzent ist ein **elektrisches Cyan/Teal**, das nur dort eingesetzt wird, wo es zählt: Primary-CTA, aktive Status, Hover-Glows, Datenlinien. Ergänzend ein **Status-Grün** („online/live") und sehr zurückhaltende Sekundärtöne. Farbe ist Funktion, nicht Dekoration — die Seite lebt von 90 % Neutral und 10 % Akzent. (Volle Hex-Werte → Teil 5.)
 
 ### Typografie
-Eine technische, klare Grotesk für UI & Headlines (**Geist Sans**, Fallback **Inter**) plus eine **Monospace** (**Geist Mono** / **JetBrains Mono**) für alles „Maschinelle": Status, Ports, Versionsnummern, Terminal-/Provisioning-Snippets, Preis-Einheiten. Dieser Doppelklang („Mensch + Maschine") ist das typografische Signatur-Element von DynStore. Headlines tight getrackt, große Sprünge in der Skala, ruhige Zeilenlängen (max. ~70 Zeichen im Fließtext).
+Eine technische, klare Grotesk für UI & Headlines (**Geist Sans**, Fallback **Inter**) plus eine **Monospace** (**Geist Mono** / **JetBrains Mono**) für alles „Maschinelle": Status, Ports, Versionsnummern, Terminal-/Provisioning-Snippets, Preis-Einheiten. Dieser Doppelklang („Mensch + Maschine") ist das typografische Signatur-Element von MeinAppNest. Headlines tight getrackt, große Sprünge in der Skala, ruhige Zeilenlängen (max. ~70 Zeichen im Fließtext).
 
 ### Layout-Prinzipien
 - **12-Spalten-Grid**, Content-Maxbreite ~1200–1280 px, großzügige Gutter (24 px).
@@ -62,7 +62,7 @@ Reihenfolge der Sektionen (Begründung: erst Versprechen, dann Schmerz, dann Lö
 - **Trust-Hinweise (unter den CTAs):** „Keine Kreditkarte nötig · 14 Tage testen · SSL & Backups inklusive · EU-Hosting".
 - **App-Preview:** kleine Reihe bekannter App-Logos („Beliebt: Plex · Jellyfin · Radarr · Vaultwarden · n8n").
 
-> **5-Sekunden-Ziel:** Beim ersten Blick muss klar sein — *DynStore hostet fertige Apps; ich muss mich nicht um Server, Docker, Updates oder Konfiguration kümmern.*
+> **5-Sekunden-Ziel:** Beim ersten Blick muss klar sein — *MeinAppNest hostet fertige Apps; ich muss mich nicht um Server, Docker, Updates oder Konfiguration kümmern.*
 
 ### 2.2 Trust / Metrics (schmaler Streifen)
 Logo-/App-Leiste + 3–4 Kennzahlen-Counter: `40+ Apps`, `< 60 Sek. Bereitstellung`, `99,9 % Uptime-Ziel`, `Automatische Backups & Updates`. Dezent, monospace-Zahlen.
@@ -70,7 +70,7 @@ Logo-/App-Leiste + 3–4 Kennzahlen-Counter: `40+ Apps`, `< 60 Sek. Bereitstellu
 ### 2.3 Problem („So fühlt sich Self-Hosting heute an")
 Raster aus 6–8 „Pain-Cards" mit Linien-Icon + kurzem Satz: Server einrichten · Docker Compose pflegen · Ports/SSL/Reverse Proxy · Updates · Backups · Ausfälle · Sicherheitsrisiken · Fehlersuche nachts/am Wochenende. Ton: empathisch, kennt den Schmerz. Visuell leicht „unruhig" (im Kontrast zur ruhigen Solution).
 
-### 2.4 Solution („Mit DynStore: 4 Schritte, fertig")
+### 2.4 Solution („Mit MeinAppNest: 4 Schritte, fertig")
 Ruhige, geordnete Gegen-Darstellung: **App auswählen → Paket buchen → Instanz startet automatisch → Zugangsdaten erhalten → nutzen.** Begleitet von einer animierten Mini-Pipeline. Botschaft: dieselben Tools, ohne den Betrieb.
 
 ### 2.5 App-Store / App-Grid (Herzstück)
@@ -83,10 +83,10 @@ Vorgefertigte Pakete als größere Cards: **Media Starter**, **Media Pro**, **Pr
 Bento-artiges Raster aus Feature-Cards: Managed Hosting, automatische Updates, Backups, SSL inklusive, eigene Subdomain (optional eigene Domain), Monitoring, Support, einfache Skalierung, App-Dashboard, isolierte Instanzen, schnelle Bereitstellung. Mix aus großen und kleinen Kacheln für Rhythmus.
 
 ### 2.8 How it works
-3–5 nummerierte Schritte als horizontale Timeline: **1. App/Stack wählen → 2. Account erstellen → 3. DynStore provisioniert → 4. Zugriff übers Dashboard → 5. Einfach nutzen.** Verbindungslinie „füllt" sich beim Scrollen.
+3–5 nummerierte Schritte als horizontale Timeline: **1. App/Stack wählen → 2. Account erstellen → 3. MeinAppNest provisioniert → 4. Zugriff übers Dashboard → 5. Einfach nutzen.** Verbindungslinie „füllt" sich beim Scrollen.
 
 ### 2.9 Comparison
-Drei-Spalten-Tabelle: **Selbst hosten · Klassischer VPS · DynStore**. Zeilen u. a. Einrichtungszeit, Wartung, Updates, Backups, SSL, Monitoring, Skalierung, nötiges Know-how. DynStore-Spalte hervorgehoben (Häkchen in Akzentfarbe).
+Drei-Spalten-Tabelle: **Selbst hosten · Klassischer VPS · MeinAppNest**. Zeilen u. a. Einrichtungszeit, Wartung, Updates, Backups, SSL, Monitoring, Skalierung, nötiges Know-how. MeinAppNest-Spalte hervorgehoben (Häkchen in Akzentfarbe).
 
 ### 2.10 Pricing
 Drei Pläne (z. B. **Single App · Stack · Pro/Team**) + Hinweis auf Add-ons, Testphase und transparente Ressourcenlogik. Monatlich/jährlich-Umschalter. **Platzhalter-Preise**, klar als Beispiel markiert. Mittlerer Plan „Empfohlen".
@@ -151,20 +151,20 @@ Mehrspaltig: Produkt · Apps · Ressourcen · Rechtliches. Plus Claim, Status-Li
 - Bundles: „Fertige Stacks für deinen Use-Case."
 - Features: „Alles inklusive, worüber du sonst nachts grübelst."
 - How it works: „In 4 Schritten startklar."
-- Comparison: „Warum DynStore statt Server selbst betreiben?"
+- Comparison: „Warum MeinAppNest statt Server selbst betreiben?"
 - Pricing: „Transparente Preise. Keine Überraschungen."
 - Security: „Saubere Infrastruktur. Keine Magie."
 
 ### 3.8 FAQ (Fragen + Antworten)
-1. **Was ist DynStore?** — DynStore ist eine Plattform für fertig gehostete Self-Hosted-Apps. Du wählst eine App oder einen Stack, buchst sie und bekommst eine vollständig eingerichtete, sichere und aktuelle Instanz — ohne dich um Server, Docker, Updates oder Konfiguration kümmern zu müssen.
-2. **Brauche ich technische Kenntnisse?** — Nein. Wenn du eine Web-App im Browser bedienen kannst, kannst du DynStore nutzen. Die gesamte Technik darunter — Server, Reverse Proxy, SSL, Updates — übernehmen wir.
+1. **Was ist MeinAppNest?** — MeinAppNest ist eine Plattform für fertig gehostete Self-Hosted-Apps. Du wählst eine App oder einen Stack, buchst sie und bekommst eine vollständig eingerichtete, sichere und aktuelle Instanz — ohne dich um Server, Docker, Updates oder Konfiguration kümmern zu müssen.
+2. **Brauche ich technische Kenntnisse?** — Nein. Wenn du eine Web-App im Browser bedienen kannst, kannst du MeinAppNest nutzen. Die gesamte Technik darunter — Server, Reverse Proxy, SSL, Updates — übernehmen wir.
 3. **Kann ich meine eigene Domain nutzen?** — Ja. Jede Instanz erhält automatisch eine eigene Subdomain mit HTTPS. Eine eigene Domain verbindest du in wenigen Klicks; wir richten das passende Zertifikat automatisch ein.
-4. **Wie schnell ist eine App bereit?** — In der Regel in unter 60 Sekunden. Nach der Buchung provisioniert DynStore die Instanz automatisch und schickt dir die Zugangsdaten.
+4. **Wie schnell ist eine App bereit?** — In der Regel in unter 60 Sekunden. Nach der Buchung provisioniert MeinAppNest die Instanz automatisch und schickt dir die Zugangsdaten.
 5. **Was passiert bei Updates?** — Updates und Sicherheits-Patches spielen wir automatisch ein, schonend und getestet. Du musst nichts tun — und kannst bei größeren Versionssprüngen optional informiert werden.
 6. **Kann ich Apps kombinieren?** — Ja. Du kannst mehrere Apps einzeln buchen oder einen vorkonfigurierten Stack wählen, in dem die Apps bereits miteinander verbunden sind (z. B. Radarr + Prowlarr + Jellyfin).
 7. **Gibt es Backups?** — Ja. Deine Daten werden regelmäßig und verschlüsselt gesichert. Im Notfall stellen wir wieder her — Backups sind in jedem Plan enthalten.
 8. **Kann ich später wechseln oder kündigen?** — Jederzeit. Du kannst Pläne upgraden, downgraden oder monatlich kündigen. Beim Kündigen kannst du deine Daten vorher exportieren.
-9. **Ist DynStore legal?** — DynStore stellt ausschließlich die Hosting-Infrastruktur und die Software bereit. Welche Inhalte du mit den Apps verarbeitest oder speicherst, liegt in deiner Verantwortung — genau wie bei jedem anderen Hosting-Anbieter.
+9. **Ist MeinAppNest legal?** — MeinAppNest stellt ausschließlich die Hosting-Infrastruktur und die Software bereit. Welche Inhalte du mit den Apps verarbeitest oder speicherst, liegt in deiner Verantwortung — genau wie bei jedem anderen Hosting-Anbieter.
 10. **Wofür bin ich als Nutzer selbst verantwortlich?** — Für deine Inhalte und Daten, deine Zugangsdaten und die rechtmäßige Nutzung der Apps. Wir kümmern uns um Betrieb, Updates, Sicherheit der Infrastruktur, Backups und Verfügbarkeit.
 
 ### 3.9 Final CTA
@@ -173,7 +173,7 @@ Mehrspaltig: Produkt · Apps · Ressourcen · Rechtliches. Plus Claim, Status-Li
 - **CTA:** „Jetzt kostenlos starten" · Sekundär: „Erst den App-Store ansehen"
 
 ### 3.10 Footer-Claim
-**„DynStore — deine Lieblings-Apps. Fertig gehostet."**
+**„MeinAppNest — deine Lieblings-Apps. Fertig gehostet."**
 *Tools starten statt Server warten.*
 
 ---
@@ -222,12 +222,12 @@ Für jede Komponente: Layout · Inhalt · Varianten · Hover · Mobile · Animat
 - **Animation:** Monatlich/Jährlich-Toggle wechselt Preis mit kurzem Zähl-/Cross-Fade.
 
 ### 4.6 Comparison Table
-- **Layout:** 4 Spalten (Merkmal · Selbst hosten · VPS · DynStore); DynStore-Spalte mit Akzent-Hintergrund.
+- **Layout:** 4 Spalten (Merkmal · Selbst hosten · VPS · MeinAppNest); MeinAppNest-Spalte mit Akzent-Hintergrund.
 - **Inhalt:** Zeilen zu Zeit, Wartung, Updates, Backups, SSL, Monitoring, Skalierung, Know-how.
 - **Varianten:** Häkchen/Kreuz · Text-Werte · kompakt (mobil).
 - **Hover:** aktive Zeile dezent hervorgehoben.
 - **Mobile:** wird zu gestapelten Karten je Anbieter / horizontal scrollbar.
-- **Animation:** Zeilen-Reveal beim Scrollen; DynStore-Häkchen „poppen" leicht.
+- **Animation:** Zeilen-Reveal beim Scrollen; MeinAppNest-Häkchen „poppen" leicht.
 
 ### 4.7 FAQ Accordion
 - **Layout:** Einspaltige Liste; je Eintrag Frage + Chevron, ausklappbare Antwort.
@@ -382,7 +382,7 @@ Pill, `accent-soft`/Status-Fläche, Caps-Label 0.75 rem `+0.04em`, optional Dot.
 
 ```
 ┌──────────────────────────────────────────────────────────────┐
-│ [NAVIGATION]  ◐ DynStore   Apps  Bundles  Preise  Features  Docs   [Anmelden] [App starten▸] │
+│ [NAVIGATION]  ◐ MeinAppNest   Apps  Bundles  Preise  Features  Docs   [Anmelden] [App starten▸] │
 ├──────────────────────────────────────────────────────────────┤
 │ [HERO]                                                        │
 │  Eyebrow: Managed App Hosting für Power-User, Teams & Creator │
@@ -416,7 +416,7 @@ Pill, `accent-soft`/Status-Fläche, Caps-Label 0.75 rem `+0.04em`, optional Dot.
 ├──────────────────────────────────────────────────────────────┤
 │ [HOW IT WORKS]  ①Wählen ─ ②Account ─ ③Provisioning ─ ④Dashboard ─ ⑤Nutzen │
 ├──────────────────────────────────────────────────────────────┤
-│ [COMPARISON]   Merkmal │ Selbst hosten │ VPS │ ✦DynStore✦     │
+│ [COMPARISON]   Merkmal │ Selbst hosten │ VPS │ ✦MeinAppNest✦     │
 │   Zeit/Wartung/Updates/Backups/SSL/Monitoring/Know-how         │
 ├──────────────────────────────────────────────────────────────┤
 │ [PRICING]  (Monatlich ◐ Jährlich)                             │
@@ -424,13 +424,13 @@ Pill, `accent-soft`/Status-Fläche, Caps-Label 0.75 rem `+0.04em`, optional Dot.
 ├──────────────────────────────────────────────────────────────┤
 │ [SECURITY]  Isolierte Instanzen · Verschlüsselung · Backups · Monitoring │
 ├──────────────────────────────────────────────────────────────┤
-│ [FAQ]  ▸ Was ist DynStore?  ▸ Technik nötig?  ▸ Eigene Domain? … (10) │
+│ [FAQ]  ▸ Was ist MeinAppNest?  ▸ Technik nötig?  ▸ Eigene Domain? … (10) │
 ├──────────────────────────────────────────────────────────────┤
 │ [FINAL CTA]  „Starte deine erste App in unter einer Minute."  │
 │              [Jetzt kostenlos starten▸]  App-Store ansehen     │
 ├──────────────────────────────────────────────────────────────┤
 │ [FOOTER]  Produkt · Apps · Ressourcen · Rechtliches           │
-│  „DynStore — deine Lieblings-Apps. Fertig gehostet."  ● Status: betriebsbereit │
+│  „MeinAppNest — deine Lieblings-Apps. Fertig gehostet."  ● Status: betriebsbereit │
 └──────────────────────────────────────────────────────────────┘
 ```
 
@@ -443,4 +443,4 @@ Pill, `accent-soft`/Status-Fläche, Caps-Label 0.75 rem `+0.04em`, optional Dot.
 - **Motion = Politur, nicht Show:** dezent, schnell, `prefers-reduced-motion` respektieren.
 - **Preise sind Platzhalter** und müssen vor Launch durch reale Werte ersetzt werden.
 
-*Begleitend geliefert: `DynStoreLanding.jsx` — lauffähige React-Landingpage (Tailwind + Framer Motion, Dark Mode), die diese Designrichtung umsetzt.*
+*Begleitend geliefert: `MeinAppNestLanding.jsx` — lauffähige React-Landingpage (Tailwind + Framer Motion, Dark Mode), die diese Designrichtung umsetzt.*

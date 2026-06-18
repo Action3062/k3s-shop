@@ -1,4 +1,4 @@
-export const metadata = { title: "AGB — DynStore" };
+export const metadata = { title: "AGB — MeinAppNest" };
 
 export default function Page() {
   return (

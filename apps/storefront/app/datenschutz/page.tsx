@@ -1,4 +1,4 @@
-export const metadata = { title: "Datenschutz — DynStore" };
+export const metadata = { title: "Datenschutz — MeinAppNest" };
 
 export default function Page() {
   return (

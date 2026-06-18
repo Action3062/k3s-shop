@@ -7,13 +7,13 @@ export function Footer() {
         <div className="flex flex-wrap justify-between gap-8 mb-7">
           <div className="flex items-center gap-2.5 font-medium text-ink">
             <span className="grid place-items-center w-7 h-7 rounded-lg text-bg font-bold text-[15px]" style={{ background: "linear-gradient(135deg,#22d3ee,#0ea5e9)" }}>D</span>
-            DynStore
+            MeinAppNest
           </div>
           <FCol title="Produkt" links={[["Apps", "/catalog"], ["Preise", "/pricing"], ["So funktioniert's", "/#how"]]} />
           <FCol title="Konto" links={[["Login", "/login"], ["Registrieren", "/signup"], ["Dashboard", "/dashboard"]]} />
           <FCol title="Rechtliches" links={[["Impressum", "/impressum"], ["AGB", "/agb"], ["Datenschutz", "/datenschutz"]]} />
         </div>
-        <div>© 2026 DynStore · Gehostet in Deutschland</div>
+        <div>© 2026 MeinAppNest · Gehostet in Deutschland</div>
       </div>
     </footer>
   );

@@ -90,4 +90,4 @@ Repo-Änderungen wie oben („Was ich dann im Repo/Cluster umstelle"), Issuer = 
 
 ## ✅ DONE (2026-06-18) — meinappnest.org live (Option D: Cloudflare)
 
-Cutover vollzogen: Cloudflare DNS (DNS-only) + ClusterIssuer `letsencrypt-cloudflare` (DNS-01) + Wildcard-Cert `*.vaultwarden.meinappnest.org` + Reflector (kube-system). `store.meinappnest.org` und `thomas.vaultwarden.meinappnest.org` sind HTTPS-gruen (HTTP 200, LE-Wildcard). `*.dyndnsv4.de` ist als DynStore-Domain stillgelegt (nur unverwandtes `vault.dyn.dyndnsv4.de` bleibt).
+Cutover vollzogen: Cloudflare DNS (DNS-only) + ClusterIssuer `letsencrypt-cloudflare` (DNS-01) + Wildcard-Cert `*.vaultwarden.meinappnest.org` + Reflector (kube-system). `store.meinappnest.org` und `thomas.vaultwarden.meinappnest.org` sind HTTPS-gruen (HTTP 200, LE-Wildcard). `*.dyndnsv4.de` ist als MeinAppNest-Domain stillgelegt (nur unverwandtes `vault.dyn.dyndnsv4.de` bleibt).

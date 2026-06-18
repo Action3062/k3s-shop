@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { signup } from "@/app/actions";
 
-export const metadata = { title: "Registrieren — DynStore" };
+export const metadata = { title: "Registrieren — MeinAppNest" };
 
 export default function Signup({ searchParams }: { searchParams: { error?: string } }) {
   return (

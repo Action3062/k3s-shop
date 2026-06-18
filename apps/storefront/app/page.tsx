@@ -38,7 +38,7 @@ export default async function Home() {
 
       <section className="section">
         <div className="wrap">
-          <span className="eyebrow">Warum DynStore</span>
+          <span className="eyebrow">Warum MeinAppNest</span>
           <h2 className="mt-2.5 mb-2 font-semibold tracking-tight text-[clamp(26px,3.4vw,38px)]">Hosting, das sich um sich selbst kümmert.</h2>
           <p className="text-muted max-w-[60ch] mb-9">Du klickst „Abonnieren". Wir kümmern uns um Ausrollen, TLS, Isolation und Lebenszyklus.</p>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-[18px]">

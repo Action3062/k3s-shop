@@ -4,7 +4,7 @@ import { auth } from "@/auth";
 import { logout } from "@/app/actions";
 import { getServices } from "@/lib/controlPlane";
 
-export const metadata = { title: "Meine Dienste — DynStore" };
+export const metadata = { title: "Meine Dienste — MeinAppNest" };
 
 const STATUS: Record<string, string> = {
   RUNNING: "text-ok", PROVISIONING: "text-accent-ink", PENDING: "text-muted",

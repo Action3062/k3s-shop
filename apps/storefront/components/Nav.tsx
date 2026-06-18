@@ -6,7 +6,7 @@ export function Nav() {
       <div className="wrap flex items-center justify-between h-16">
         <Link href="/" className="flex items-center gap-2.5 font-medium">
           <span className="grid place-items-center w-7 h-7 rounded-lg text-bg font-bold text-[15px]" style={{ background: "linear-gradient(135deg,#22d3ee,#0ea5e9)" }}>D</span>
-          DynStore
+          MeinAppNest
         </Link>
         <nav className="hidden md:flex gap-7 text-[15px]">
           <Link href="/catalog" className="text-muted hover:text-ink">Apps</Link>

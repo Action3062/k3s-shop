@@ -5,7 +5,7 @@
 
 ## Kontext
 
-DynStore ist eine self-service Multi-Tenant-Hosting-Plattform (ElfHosted-Stil) auf **bestehender** Infrastruktur — diese wird genutzt, nicht neu gebaut:
+MeinAppNest ist eine self-service Multi-Tenant-Hosting-Plattform (ElfHosted-Stil) auf **bestehender** Infrastruktur — diese wird genutzt, nicht neu gebaut:
 
 - k3s HA-Cluster bei Hetzner (3 Control-Plane-Nodes, x86 `cx23`, `allow_scheduling_on_control_plane=true`, k3s v1.33), provisioniert via kube-hetzner (openSUSE MicroOS).
 - Traefik als Ingress-Controller; cert-manager mit ClusterIssuer `letsencrypt-prod` (HTTP-01).

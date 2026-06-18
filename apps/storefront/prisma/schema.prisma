@@ -1,4 +1,4 @@
-// DynStore — Tenant-Datenmodell (Entwurf, Phase 0)
+// MeinAppNest — Tenant-Datenmodell (Entwurf, Phase 0)
 // Quelle der Wahrheit für die Control-Plane. Migrations folgen in Phase 2.
 
 generator client {

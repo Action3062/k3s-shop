@@ -1,6 +1,6 @@
 import { getCatalog } from "@/lib/controlPlane";
 
-export const metadata = { title: "Preise — DynStore" };
+export const metadata = { title: "Preise — MeinAppNest" };
 
 export default async function Pricing() {
   const catalog = await getCatalog();
