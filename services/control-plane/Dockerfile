@@ -1,7 +1,7 @@
 # ---- build ----
 FROM node:22-alpine AS build
 WORKDIR /app
-RUN apk add --no-cache openssl
+RUN apk add --no-cache openssl git
 COPY package.json ./
 RUN npm install
 COPY tsconfig.json ./
@@ -12,7 +12,7 @@ RUN npm run build
 # ---- runtime ----
 FROM node:22-alpine
 WORKDIR /app
-RUN apk add --no-cache openssl
+RUN apk add --no-cache openssl git
 ENV NODE_ENV=production
 COPY package.json ./
 RUN npm install --omit=dev

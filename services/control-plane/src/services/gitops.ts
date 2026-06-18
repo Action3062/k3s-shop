@@ -14,7 +14,7 @@ async function init(): Promise<SimpleGit> {
   const git = simpleGit(config.GITOPS_WORKDIR);
   const isRepo = await git.checkIsRepo().catch(() => false);
   if (!isRepo) {
-    logger.info({ url: config.GITOPS_REPO_URL }, 'cloning gitops repo');
+    logger.info({ url: config.GITOPS_REPO_URL.replace(/\/\/[^@]*@/, '//***@') }, 'cloning gitops repo');
     await simpleGit().clone(config.GITOPS_REPO_URL, config.GITOPS_WORKDIR);
   }
   await git.addConfig('user.name', config.GIT_AUTHOR_NAME);
