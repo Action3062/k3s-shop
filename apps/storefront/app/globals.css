@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-:root { color-scheme: dark; }
+:root { color-scheme: dark; --font-sans: 'Inter'; --font-mono: 'JetBrains Mono'; }
 html { scroll-behavior: smooth; }
 body { background: #07090C; color: #EBF1F6; line-height: 1.6; }
 ::selection { background: rgba(34, 211, 238, 0.25); color: #fff; }

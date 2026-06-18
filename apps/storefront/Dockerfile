@@ -11,6 +11,7 @@ RUN npm run build && npm prune --omit=dev
 # ---- runtime ----
 FROM node:22-slim
 WORKDIR /app
+RUN apt-get update && apt-get install -y --no-install-recommends openssl ca-certificates && rm -rf /var/lib/apt/lists/*
 ENV NODE_ENV=production NEXT_TELEMETRY_DISABLED=1 PORT=3000
 COPY --from=build /app/.next ./.next
 COPY --from=build /app/public ./public
