@@ -1,0 +1,505 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>DynStore — Self-hosted Power. Ohne den Self-hosting Stress.</title>
+<style>
+  :root{
+    --bg:#07090C; --bgEl:#0C1014; --s1:#11151B; --s2:#161C24; --s3:#1C2430;
+    --bSub:rgba(255,255,255,.06); --bDef:rgba(255,255,255,.10); --bStr:rgba(255,255,255,.16);
+    --bGlow:rgba(34,211,238,.45);
+    --tp:#EBF1F6; --ts:#A4B1BE; --tm:#637180; --onAcc:#04181C;
+    --acc:#22D3EE; --accStr:#06B6D4; --accSoft:rgba(34,211,238,.12); --live:#34D399;
+    --grad:linear-gradient(135deg,#22D3EE 0%,#0EA5E9 100%);
+    --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+    --sans:"Inter",system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--tp);font-family:var(--sans);line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+  a{color:inherit;text-decoration:none}
+  .wrap{max-width:1200px;margin:0 auto;padding:0 24px}
+  .eyebrow{display:inline-flex;align-items:center;gap:8px;color:var(--acc);font-size:12px;font-weight:600;letter-spacing:.12em;text-transform:uppercase}
+  h1,h2{letter-spacing:-.02em;line-height:1.08;font-weight:600}
+  h2{font-size:clamp(26px,4vw,38px)}
+  .sub{color:var(--ts);font-size:clamp(15px,2vw,18px);max-width:640px}
+  .sec{padding:96px 0}
+  .sec-head{max-width:640px;margin-bottom:48px}
+  .sec-head.center{margin-left:auto;margin-right:auto;text-align:center}
+  .mono{font-family:var(--mono)}
+  .btn{display:inline-flex;align-items:center;gap:8px;border-radius:12px;padding:13px 20px;font-size:14px;font-weight:600;cursor:pointer;border:1px solid transparent;transition:transform .18s ease,box-shadow .2s ease,background .2s ease;font-family:inherit}
+  .btn:active{transform:scale(.98)}
+  .btn-primary{background:var(--grad);color:var(--onAcc);box-shadow:0 8px 30px rgba(34,211,238,.25)}
+  .btn-primary:hover{transform:translateY(-1px);box-shadow:0 10px 40px rgba(34,211,238,.4)}
+  .btn-ghost{background:rgba(255,255,255,.04);color:var(--tp);border-color:var(--bDef);backdrop-filter:blur(12px)}
+  .btn-ghost:hover{border-color:var(--bStr);background:rgba(255,255,255,.07)}
+  .btn .arr{transition:transform .2s}
+  .btn:hover .arr{transform:translateX(2px)}
+  .full{width:100%;justify-content:center}
+  .badge{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:4px 10px;font-size:11px;font-weight:600;letter-spacing:.04em;text-transform:uppercase}
+  .badge.acc{background:var(--accSoft);color:var(--acc)}
+  .badge.live{background:rgba(52,211,153,.12);color:var(--live)}
+  .dot{width:6px;height:6px;border-radius:50%;background:currentColor;animation:pulse 1.8s ease-in-out infinite}
+  @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.35;transform:scale(.8)}}
+  header{position:sticky;top:0;z-index:50;background:rgba(7,9,12,.6);backdrop-filter:blur(16px);border-bottom:1px solid var(--bSub)}
+  .nav{display:flex;align-items:center;justify-content:space-between;padding:14px 0}
+  .logo{display:flex;align-items:center;gap:8px;font-weight:600}
+  .logo .mark{width:32px;height:32px;border-radius:9px;background:var(--grad);display:flex;align-items:center;justify-content:center;color:var(--onAcc);font-weight:700}
+  .nav nav{display:flex;gap:28px;font-size:14px;color:var(--ts)}
+  .nav nav a:hover{color:#fff}
+  .nav-r{display:flex;align-items:center;gap:14px}
+  .nav-r .signin{font-size:14px;color:var(--ts)}
+  @media(max-width:860px){.nav nav,.nav-r .signin{display:none}}
+  .hero{position:relative}
+  .hero::before{content:"";position:absolute;inset:0;height:600px;background:radial-gradient(900px circle at 75% -10%,rgba(34,211,238,.10),transparent 60%);pointer-events:none}
+  .hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:48px;align-items:center;padding:72px 0 40px;position:relative}
+  @media(max-width:900px){.hero-grid{grid-template-columns:1fr;gap:24px}}
+  h1{font-size:clamp(34px,6vw,60px);margin-top:20px}
+  .hero .gradtext{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .hero p.lead{margin-top:24px;max-width:560px;color:var(--ts);font-size:clamp(15px,2vw,18px)}
+  .cta-row{display:flex;flex-wrap:wrap;gap:12px;margin-top:32px}
+  .trust{display:flex;flex-wrap:wrap;gap:8px 20px;margin-top:24px;font-size:12px;color:var(--tm)}
+  .trust span{display:inline-flex;align-items:center;gap:6px}
+  .tick{color:var(--live)}
+  .visual{position:relative;aspect-ratio:1;max-width:440px;margin:0 auto;width:100%}
+  .visual .amb{position:absolute;inset:0;background:radial-gradient(circle at 50% 45%,rgba(34,211,238,.18),transparent 60%)}
+  .ring{position:absolute;border:1px solid var(--bSub);border-radius:50%}
+  .ring.r1{inset:0}.ring.r2{inset:17%}.ring.r3{inset:32%}
+  .orbit{position:absolute;inset:0;animation:spin 48s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .node{position:absolute;width:48px;height:48px;border-radius:16px;background:var(--s2);border:1px solid var(--bDef);display:flex;align-items:center;justify-content:center;color:var(--acc);box-shadow:0 8px 24px rgba(0,0,0,.5);transform:translate(-50%,-50%);animation:spinr 48s linear infinite}
+  @keyframes spinr{to{transform:translate(-50%,-50%) rotate(-360deg)}}
+  .node .ld{position:absolute;top:-3px;right:-3px;width:10px;height:10px;border-radius:50%;background:var(--live);box-shadow:0 0 8px var(--live)}
+  .core{position:absolute;left:50%;top:50%;width:84px;height:84px;transform:translate(-50%,-50%);border-radius:22px;background:var(--grad);display:flex;align-items:center;justify-content:center;color:var(--onAcc);box-shadow:0 0 44px rgba(34,211,238,.45);font-size:30px}
+  .term{position:absolute;bottom:-22px;left:50%;transform:translateX(-50%);width:92%;border-radius:12px;padding:12px;background:rgba(12,16,20,.88);border:1px solid var(--bDef);backdrop-filter:blur(12px);font-family:var(--mono);font-size:11px;color:var(--ts)}
+  .term .tdots{display:flex;gap:6px;align-items:center;margin-bottom:8px}
+  .term .tdots i{width:10px;height:10px;border-radius:50%;display:inline-block}
+  .term .line{opacity:0;animation:fadein .4s forwards}
+  @keyframes fadein{to{opacity:1}}
+  .metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;background:var(--s1);border:1px solid var(--bSub);border-radius:20px;padding:24px}
+  @media(max-width:640px){.metrics{grid-template-columns:repeat(2,1fr)}}
+  .metric{text-align:center}
+  .metric .v{font-family:var(--mono);font-size:clamp(22px,3vw,30px);font-weight:600}
+  .metric .l{font-size:12px;color:var(--tm);margin-top:4px}
+  .grid{display:grid;gap:16px}
+  .g4{grid-template-columns:repeat(4,1fr)}
+  .g3{grid-template-columns:repeat(3,1fr)}
+  .g2{grid-template-columns:repeat(2,1fr)}
+  @media(max-width:1000px){.g4{grid-template-columns:repeat(2,1fr)}.g3{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:640px){.g4,.g3,.g2{grid-template-columns:1fr}}
+  .card{background:var(--s1);border:1px solid var(--bDef);border-radius:20px;padding:20px;transition:transform .2s ease,border-color .2s ease,box-shadow .2s ease}
+  .card:hover{transform:translateY(-4px);border-color:var(--bGlow);box-shadow:0 0 0 1px rgba(34,211,238,.25),0 12px 50px rgba(34,211,238,.1)}
+  .ico{width:40px;height:40px;border-radius:12px;background:var(--accSoft);display:flex;align-items:center;justify-content:center;color:var(--acc);font-size:18px}
+  .pain{background:var(--s1);border:1px solid var(--bSub);border-radius:14px;padding:16px;color:var(--ts);font-size:14px}
+  .pain .pi{color:var(--tm);font-size:20px}
+  .steps{display:grid;grid-template-columns:repeat(5,1fr);gap:16px;position:relative}
+  @media(max-width:900px){.steps{grid-template-columns:repeat(2,1fr)}}
+  .step{background:var(--s1);border:1px solid var(--bDef);border-radius:18px;padding:20px}
+  .step .top{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+  .step .n{font-family:var(--mono);font-size:12px;color:var(--tm)}
+  .step h3{font-size:14px;font-weight:600}
+  .step p{font-size:12px;color:var(--ts);margin-top:4px}
+  .ico-sm{width:36px;height:36px;border-radius:10px;background:var(--accSoft);display:flex;align-items:center;justify-content:center;color:var(--acc)}
+  .toolbar{display:flex;flex-direction:column;gap:16px;margin-bottom:24px}
+  .search{position:relative}
+  .search i{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--tm)}
+  .search input{width:100%;background:var(--s3);border:1px solid var(--bDef);border-radius:12px;color:var(--tp);padding:12px 16px 12px 42px;font-size:14px;font-family:inherit;outline:none}
+  .search input:focus{border-color:var(--bGlow);box-shadow:0 0 0 3px rgba(34,211,238,.12)}
+  .chips{display:flex;flex-wrap:wrap;gap:8px}
+  .chip{border-radius:999px;padding:7px 14px;font-size:12px;font-weight:500;cursor:pointer;background:rgba(255,255,255,.03);color:var(--ts);border:1px solid var(--bSub);transition:.15s}
+  .chip:hover{border-color:var(--bDef)}
+  .chip.active{background:var(--accSoft);color:var(--acc);border-color:var(--bGlow)}
+  .appcard{display:flex;flex-direction:column;height:100%}
+  .appcard .ah{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px}
+  .appcard .logo-chip{width:44px;height:44px;border-radius:12px;background:var(--s3);border:1px solid var(--bSub);display:flex;align-items:center;justify-content:center;color:var(--acc);font-size:18px}
+  .appcard h3{font-size:16px;font-weight:600}
+  .appcard .cat{font-size:12px;color:var(--tm);margin-bottom:8px}
+  .appcard .desc{font-size:14px;color:var(--ts);margin-bottom:16px}
+  .tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px}
+  .tag{border-radius:6px;padding:2px 8px;font-size:11px;background:rgba(255,255,255,.05);color:var(--tm)}
+  .appcard .foot{margin-top:auto;display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--bSub);padding-top:16px}
+  .price .p{font-family:var(--mono);font-size:18px;font-weight:600}
+  .price .u,.price .a{font-size:12px;color:var(--tm)}
+  .book{color:var(--acc);font-size:14px;font-weight:600;background:none;border:none;cursor:pointer;display:inline-flex;gap:4px;align-items:center;font-family:inherit}
+  .note{margin-top:12px;font-size:11px;color:var(--tm);display:flex;gap:6px;align-items:center}
+  .bundle{display:flex;flex-direction:column}
+  .bundle.feat{border-color:var(--bGlow);box-shadow:0 0 0 1px rgba(34,211,238,.25),0 12px 50px rgba(34,211,238,.1)}
+  .bundle h3{font-size:18px;font-weight:600}
+  .bundle .aud{font-size:12px;color:var(--tm);margin-top:4px}
+  .appchips{display:flex;flex-wrap:wrap;gap:6px;margin-top:16px}
+  .appchip{border-radius:6px;padding:4px 8px;font-size:11px;background:var(--s3);border:1px solid var(--bSub);color:var(--ts)}
+  .perks{list-style:none;margin-top:16px;display:flex;flex-direction:column;gap:8px}
+  .perks li{display:flex;gap:8px;font-size:14px;color:var(--ts)}
+  .perks .tick{margin-top:3px}
+  .bundle .pr{margin-top:20px;border-top:1px solid var(--bSub);padding-top:16px}
+  .bundle .pr .p{font-family:var(--mono);font-size:24px;font-weight:600}
+  .feat-ic h3{font-size:16px;font-weight:600;margin-top:16px}
+  .feat-ic p{font-size:14px;color:var(--ts);margin-top:6px}
+  .span2{grid-column:span 2}
+  @media(max-width:640px){.span2{grid-column:span 1}}
+  .table-wrap{overflow-x:auto;border:1px solid var(--bDef);border-radius:20px}
+  table{border-collapse:collapse;width:100%;min-width:640px;font-size:14px}
+  thead{background:var(--s2)}
+  th{padding:16px;text-align:center;font-weight:600;color:var(--ts)}
+  th.f{text-align:left;color:var(--tm)}
+  th.dyn{color:var(--acc);background:var(--accSoft)}
+  td{padding:16px;text-align:center;color:var(--tm);border-top:1px solid var(--bSub)}
+  td.f{text-align:left;color:var(--tp)}
+  td.dyn{color:var(--tp);background:var(--accSoft);font-weight:500}
+  td.dyn i{color:var(--acc);margin-right:4px}
+  .toggle{display:flex;align-items:center;justify-content:center;gap:12px;font-size:14px;margin-bottom:32px}
+  .sw{position:relative;width:48px;height:28px;border-radius:999px;background:var(--s3);border:1px solid var(--bDef);cursor:pointer;transition:.2s}
+  .sw.on{background:var(--accStr)}
+  .sw .knob{position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:left .2s ease}
+  .sw.on .knob{left:23px}
+  .muted{color:var(--tm)}.on-t{color:var(--tp)}
+  .save{color:var(--live)}
+  .plan{position:relative;display:flex;flex-direction:column;background:var(--s1);border:1px solid var(--bDef);border-radius:20px;padding:24px;transition:transform .2s}
+  .plan:hover{transform:translateY(-4px)}
+  .plan.feat{border-color:var(--bGlow);box-shadow:0 0 0 1px rgba(34,211,238,.25),0 16px 50px rgba(34,211,238,.1)}
+  .plan .ribbon{position:absolute;top:-12px;left:24px}
+  .plan h3{font-size:16px;font-weight:600}
+  .plan .tg{font-size:12px;color:var(--tm);margin-top:4px}
+  .plan .amt{font-family:var(--mono);font-size:40px;font-weight:600;margin-top:20px;line-height:1}
+  .plan .amt span{font-size:14px;color:var(--tm);font-family:var(--sans)}
+  .plan .bill{font-size:12px;color:var(--tm);margin-top:6px}
+  .plan ul{list-style:none;margin:20px 0;display:flex;flex-direction:column;gap:10px}
+  .plan li{display:flex;gap:8px;font-size:14px;color:var(--ts)}
+  .plan li i{color:var(--acc);margin-top:3px}
+  .sc{background:var(--s1);border:1px solid var(--bDef);border-radius:20px;padding:20px}
+  .sc i{color:var(--acc);font-size:22px}
+  .sc h3{font-size:14px;font-weight:600;margin-top:12px}
+  .sc p{font-size:12px;color:var(--ts);margin-top:4px}
+  .faq{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:12px}
+  .qa{background:var(--s1);border:1px solid var(--bDef);border-radius:12px;overflow:hidden}
+  .qa button{width:100%;display:flex;justify-content:space-between;align-items:center;gap:16px;padding:16px 20px;background:none;border:none;color:var(--tp);font-size:15px;font-weight:500;cursor:pointer;text-align:left;font-family:inherit}
+  .qa .chev{transition:transform .2s;color:var(--tm)}
+  .qa.open .chev{transform:rotate(180deg);color:var(--acc)}
+  .qa .ans{max-height:0;overflow:hidden;transition:max-height .3s ease}
+  .qa .ans p{padding:0 20px 18px;font-size:14px;color:var(--ts)}
+  .final{position:relative;overflow:hidden;background:var(--s1);border:1px solid var(--bDef);border-radius:24px;padding:64px 24px;text-align:center}
+  .final::before{content:"";position:absolute;inset:0;background:radial-gradient(600px circle at 50% 0%,rgba(34,211,238,.16),transparent 60%)}
+  .final>*{position:relative}
+  .final p{color:var(--ts);max-width:560px;margin:16px auto 0}
+  footer{border-top:1px solid var(--bSub);margin-top:32px}
+  .fgrid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:32px;padding:48px 0}
+  @media(max-width:760px){.fgrid{grid-template-columns:1fr 1fr}}
+  .fcol h4{font-size:14px;font-weight:600;margin-bottom:12px}
+  .fcol ul{list-style:none;display:flex;flex-direction:column;gap:8px;font-size:14px;color:var(--ts)}
+  .fcol a:hover{color:#fff}
+  .fclaim{font-size:14px;color:var(--ts);max-width:280px}
+  .status{display:inline-flex;align-items:center;gap:8px;font-size:12px;color:var(--tm);margin-top:16px}
+  .status .d{width:8px;height:8px;border-radius:50%;background:var(--live);box-shadow:0 0 8px var(--live)}
+  .fbot{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;border-top:1px solid var(--bSub);padding:24px 0;font-size:12px;color:var(--tm)}
+  .rv{opacity:0;transform:translateY(16px);transition:opacity .6s cubic-bezier(.22,1,.36,1),transform .6s cubic-bezier(.22,1,.36,1)}
+  .rv.in{opacity:1;transform:none}
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.rv{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap nav">
+    <div class="logo"><span class="mark">◐</span> DynStore</div>
+    <nav>
+      <a href="#apps">Apps</a><a href="#bundles">Bundles</a><a href="#pricing">Preise</a>
+      <a href="#features">Features</a><a href="#faq">Docs</a>
+    </nav>
+    <div class="nav-r">
+      <a class="signin" href="#">Anmelden</a>
+      <button class="btn btn-primary" style="padding:8px 16px;font-size:13px">App starten <span class="arr">→</span></button>
+    </div>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <span class="eyebrow">✦ Managed App Hosting für Power-User, Teams &amp; Creator</span>
+      <h1>Self-hosted Power.<br><span class="gradtext">Ohne den Self-hosting Stress.</span></h1>
+      <p class="lead">Plex, Jellyfin, Nextcloud, n8n und 40+ weitere Tools — fertig gehostet und in unter 60 Sekunden startklar. Keine Server, kein Docker, keine Updates. Du wählst die App, wir kümmern uns um den Rest.</p>
+      <div class="cta-row">
+        <button class="btn btn-primary">App in 60 Sek. starten <span class="arr">→</span></button>
+        <a href="#apps" class="btn btn-ghost">App-Store ansehen</a>
+      </div>
+      <div class="trust">
+        <span><span class="tick">✓</span> Keine Kreditkarte nötig</span>
+        <span><span class="tick">✓</span> 14 Tage testen</span>
+        <span><span class="tick">✓</span> SSL &amp; Backups inklusive</span>
+        <span><span class="tick">✓</span> EU-Hosting</span>
+      </div>
+    </div>
+    <div class="visual">
+      <div class="amb"></div>
+      <div class="ring r1"></div><div class="ring r2"></div><div class="ring r3"></div>
+      <div class="orbit" id="orbit"></div>
+      <div class="core">☁</div>
+      <div class="term">
+        <div class="tdots"><i style="background:#FF5F57"></i><i style="background:#FEBC2E"></i><i style="background:#28C840"></i><span style="margin-left:6px;color:var(--tm)">provisioning</span></div>
+        <div class="line" style="animation-delay:.6s">→ pull image …</div>
+        <div class="line" style="animation-delay:1.1s">→ configure instance …</div>
+        <div class="line" style="animation-delay:1.6s">→ issue SSL cert …</div>
+        <div class="line" style="animation-delay:2.2s;color:var(--live)">✓ live · https://dein-app.dynstore.io</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="wrap" style="padding:32px 24px">
+  <div class="metrics rv">
+    <div class="metric"><div class="v">40+</div><div class="l">Apps &amp; Tools</div></div>
+    <div class="metric"><div class="v">&lt; 60s</div><div class="l">Bereitstellung</div></div>
+    <div class="metric"><div class="v">99,9 %</div><div class="l">Uptime-Ziel</div></div>
+    <div class="metric"><div class="v">EU</div><div class="l">Hosting-Region</div></div>
+  </div>
+</div>
+
+<section class="sec wrap">
+  <div class="sec-head rv">
+    <span class="eyebrow">✦ Das Problem</span>
+    <h2 style="margin-top:12px">Self-Hosting ist mächtig — und ein Vollzeitjob.</h2>
+    <p class="sub" style="margin-top:16px">Die Tools sind großartig. Der Betrieb drumherum frisst Abende, Wochenenden und Nerven.</p>
+  </div>
+  <div class="grid g4" id="pains"></div>
+</section>
+
+<section class="sec wrap" id="how">
+  <div class="sec-head rv">
+    <span class="eyebrow">✦ Die Lösung</span>
+    <h2 style="margin-top:12px">Dieselben Tools. Ohne den Betrieb.</h2>
+    <p class="sub" style="margin-top:16px">In wenigen Schritten von der Auswahl zur laufenden App — den Rest übernimmt DynStore.</p>
+  </div>
+  <div class="steps" id="steps"></div>
+</section>
+
+<section class="sec wrap" id="apps">
+  <div class="sec-head rv">
+    <span class="eyebrow">✦ App-Store</span>
+    <h2 style="margin-top:12px">Wähle aus 40+ fertig gehosteten Apps.</h2>
+    <p class="sub" style="margin-top:16px">Ein App Store für Self-Hosted Tools — gebucht, gestartet, genutzt.</p>
+  </div>
+  <div class="toolbar">
+    <div class="search"><i>⌕</i><input id="q" placeholder="App suchen … (z. B. Plex, n8n)"></div>
+    <div class="chips" id="chips"></div>
+  </div>
+  <div class="grid g4" id="apps-grid"></div>
+  <div id="noapps" style="display:none;text-align:center;color:var(--tm);padding:48px 0;font-size:14px">Keine Treffer — versuch eine andere Kategorie oder Suche.</div>
+</section>
+
+<section class="sec wrap" id="bundles">
+  <div class="sec-head rv">
+    <span class="eyebrow">✦ Bundles &amp; Stacks</span>
+    <h2 style="margin-top:12px">Fertige Stacks für deinen Use-Case.</h2>
+    <p class="sub" style="margin-top:16px">Vorkonfiguriert, verbunden und überwacht — günstiger als die Summe der Einzel-Apps.</p>
+  </div>
+  <div class="grid g3" id="bundles-grid"></div>
+</section>
+
+<section class="sec wrap" id="features">
+  <div class="sec-head rv">
+    <span class="eyebrow">✦ Features</span>
+    <h2 style="margin-top:12px">Alles inklusive, worüber du sonst nachts grübelst.</h2>
+    <p class="sub" style="margin-top:16px">Betrieb, Sicherheit und Wartung — übernommen, damit du nur noch nutzt.</p>
+  </div>
+  <div class="grid g3" id="features-grid"></div>
+</section>
+
+<section class="sec wrap">
+  <div class="sec-head rv">
+    <span class="eyebrow">✦ Vergleich</span>
+    <h2 style="margin-top:12px">Warum DynStore statt Server selbst betreiben?</h2>
+    <p class="sub" style="margin-top:16px">Dieselben Apps — aber ohne die Arbeit drumherum.</p>
+  </div>
+  <div class="table-wrap rv">
+    <table>
+      <thead><tr><th class="f">Merkmal</th><th>Selbst hosten</th><th>Klassischer VPS</th><th class="dyn">DynStore</th></tr></thead>
+      <tbody id="compare-body"></tbody>
+    </table>
+  </div>
+</section>
+
+<section class="sec wrap" id="pricing">
+  <div class="sec-head center rv">
+    <span class="eyebrow">✦ Preise</span>
+    <h2 style="margin-top:12px">Transparente Preise. Keine Überraschungen.</h2>
+    <p class="sub" style="margin:16px auto 0">Beispielpreise — flexibel monatlich oder jährlich. 14 Tage testen, jederzeit kündbar.</p>
+  </div>
+  <div class="toggle">
+    <span id="lblM" class="on-t">Monatlich</span>
+    <div class="sw" id="sw"><div class="knob"></div></div>
+    <span id="lblY" class="muted">Jährlich <span class="save">· 2 Monate gratis</span></span>
+  </div>
+  <div class="grid g3" id="pricing-grid"></div>
+  <p style="text-align:center;color:var(--tm);font-size:12px;margin-top:24px">Add-ons (mehr Speicher, Leistung, eigene Domain) flexibel zubuchbar · Ressourcen transparent ausgewiesen</p>
+</section>
+
+<section class="sec wrap">
+  <div class="sec-head rv">
+    <span class="eyebrow">✦ Sicherheit &amp; Vertrauen</span>
+    <h2 style="margin-top:12px">Saubere Infrastruktur. Keine Magie.</h2>
+    <p class="sub" style="margin-top:16px">Klar getrennte Verantwortlichkeiten — wir betreiben sicher, du nutzt sorgenfrei.</p>
+  </div>
+  <div class="grid g4" id="security-grid"></div>
+</section>
+
+<section class="sec wrap" id="faq">
+  <div class="sec-head center rv"><span class="eyebrow">✦ FAQ</span><h2 style="margin-top:12px">Häufige Fragen</h2></div>
+  <div class="faq" id="faq-list"></div>
+</section>
+
+<section class="sec wrap">
+  <div class="final rv">
+    <h2>Starte deine erste App in unter einer Minute.</h2>
+    <p>Keine Server. Kein Docker. Keine Update-Nächte. Nur deine Tools — sofort einsatzbereit.</p>
+    <div class="cta-row" style="justify-content:center;margin-top:32px">
+      <button class="btn btn-primary">Jetzt kostenlos starten <span class="arr">→</span></button>
+      <a href="#apps" class="btn btn-ghost">Erst den App-Store ansehen</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="fgrid">
+      <div>
+        <div class="logo"><span class="mark">◐</span> DynStore</div>
+        <p class="fclaim" style="margin-top:12px">Deine Lieblings-Apps. Fertig gehostet.<br>Tools starten statt Server warten.</p>
+        <div class="status"><span class="d"></span> Alle Systeme betriebsbereit</div>
+      </div>
+      <div class="fcol"><h4>Produkt</h4><ul><li><a href="#apps">Apps</a></li><li><a href="#bundles">Bundles</a></li><li><a href="#pricing">Preise</a></li><li><a href="#features">Features</a></li></ul></div>
+      <div class="fcol"><h4>Ressourcen</h4><ul><li><a href="#">Docs</a></li><li><a href="#">Status</a></li><li><a href="#">Changelog</a></li><li><a href="#">Support</a></li></ul></div>
+      <div class="fcol"><h4>Rechtliches</h4><ul><li><a href="#">Impressum</a></li><li><a href="#">Datenschutz</a></li><li><a href="#">AGB</a></li></ul></div>
+    </div>
+    <div class="fbot"><span>© <span id="yr"></span> DynStore. Alle Rechte vorbehalten.</span><span>Made for Power-User, Teams &amp; Creator · EU-Hosting</span></div>
+  </div>
+</footer>
+
+<script>
+const APPS=[
+ {name:"Plex",cat:"Media",ic:"▶",desc:"Filme & Serien auf jedem Gerät streamen — ohne eigenen Server.",price:7,tags:["Streaming","4K"],note:"Integration: Radarr, Sonarr",status:"Beliebt"},
+ {name:"Jellyfin",cat:"Media",ic:"▶",desc:"Freie, werbefreie Medienzentrale mit voller Kontrolle.",price:6,tags:["Open Source","Streaming"],note:"Integration: Arr-Stack",status:"Beliebt"},
+ {name:"Radarr",cat:"Automatisierung",ic:"▦",desc:"Automatische Verwaltung deiner Filmsammlung.",price:4,tags:["Automation","Arr"],note:"Integration: Prowlarr, Plex",status:null},
+ {name:"Sonarr",cat:"Automatisierung",ic:"▦",desc:"Serien automatisch organisieren und aktuell halten.",price:4,tags:["Automation","Arr"],note:"Integration: Prowlarr",status:null},
+ {name:"Prowlarr",cat:"Automatisierung",ic:"≣",desc:"Zentrale Indexer-Verwaltung für den ganzen Arr-Stack.",price:3,tags:["Indexer","Arr"],note:"Verbindet Radarr & Sonarr",status:null},
+ {name:"Nextcloud",cat:"Cloud & Dateien",ic:"☁",desc:"Deine eigene Cloud für Dateien, Kalender & Kontakte.",price:8,tags:["Storage","Sync"],note:"EU-Hosting, DSGVO-freundlich",status:"Beliebt"},
+ {name:"Vaultwarden",cat:"Sicherheit",ic:"🔒",desc:"Bitwarden-kompatibler Passwort-Manager, nur für dich.",price:3,tags:["Security","Vault"],note:"Bitwarden-Clients kompatibel",status:null},
+ {name:"n8n",cat:"KI & Produktivität",ic:"⚡",desc:"Workflows & Automationen visuell bauen — ohne Code.",price:9,tags:["Automation","Low-Code"],note:"400+ Integrationen",status:"Beliebt"},
+ {name:"Uptime Kuma",cat:"Monitoring",ic:"◔",desc:"Schönes Status- & Uptime-Monitoring für deine Dienste.",price:3,tags:["Monitoring","Status"],note:"Benachrichtigungen inkl.",status:null},
+ {name:"Homepage",cat:"Monitoring",ic:"◳",desc:"Elegantes Dashboard, das alle deine Apps bündelt.",price:2,tags:["Dashboard"],note:"Widgets für 100+ Apps",status:"Neu"},
+ {name:"Paperless-ngx",cat:"KI & Produktivität",ic:"≣",desc:"Papierloses Büro: Dokumente scannen, taggen, finden.",price:6,tags:["Docs","OCR"],note:"Volltextsuche & OCR",status:null},
+ {name:"Grafana",cat:"Monitoring",ic:"◔",desc:"Dashboards & Visualisierung für all deine Metriken.",price:7,tags:["Monitoring","Charts"],note:"Datenquellen-Integrationen",status:null}
+];
+const CATS=["Alle","Media","Automatisierung","Cloud & Dateien","Sicherheit","Monitoring","KI & Produktivität"];
+const PAINS=[["▤","Server einrichten"],["▦","Docker Compose pflegen"],["⊕","Ports, SSL & Reverse Proxy"],["⟳","Updates nachziehen"],["⛁","Backups & Restore"],["⚠","Ausfälle & Downtime"],["🔒","Sicherheitsrisiken"],["☾","Debugging nachts & am Wochenende"]];
+const STEPS=[["01","⌕","App oder Stack wählen","Stöbere im Store und wähle, was du brauchst."],["02","▦","Account erstellen","In Sekunden registriert — keine Kreditkarte nötig."],["03","▣","DynStore provisioniert","Wir richten Instanz, SSL & Domain automatisch ein."],["04","◳","Zugriff übers Dashboard","Zugangsdaten erhalten, alles an einem Ort."],["05","✓","Einfach nutzen","Loslegen — wir kümmern uns um den Betrieb."]];
+const BUNDLES=[
+ {name:"Media Starter Stack",aud:"Für Einsteiger ins eigene Streaming",apps:["Jellyfin","Radarr","Sonarr","Prowlarr"],price:14,perks:["Fertig verkabelt & automatisiert","Eine Medienzentrale, ein Login","Günstiger als einzeln"],feat:false},
+ {name:"Productivity Stack",aud:"Für Selbstständige & kleine Teams",apps:["Nextcloud","Vaultwarden","Paperless-ngx"],price:18,perks:["Dateien, Passwörter & papierloses Büro","EU-Hosting, DSGVO-freundlich","Geteilter Team-Zugang"],feat:true},
+ {name:"Automation Stack",aud:"Für Power-User & Maker",apps:["n8n","Flowise","Open WebUI"],price:22,perks:["Workflows & eigene KI-Tools","Ohne Setup-Hölle","Skaliert mit dir mit"],feat:false}
+];
+const FEATURES=[
+ ["▤","Managed Hosting","Wir betreiben deine Apps auf sicherer, überwachter Infrastruktur. Du nutzt sie einfach.",true],
+ ["⟳","Automatische Updates","Versionen & Sicherheits-Patches laufen automatisch ein — keine kaputten Container.",false],
+ ["⛁","Backups inklusive","Regelmäßige, verschlüsselte Backups. Im Ernstfall stellen wir wieder her.",false],
+ ["⊕","SSL & eigene Domain","HTTPS und eigene Subdomain ab Werk. Eigene Domain in wenigen Klicks.",false],
+ ["⛨","Isolierte Instanzen","Jede App läuft sauber getrennt — mehr Sicherheit, keine Nebenwirkungen.",true],
+ ["◔","Monitoring & Status","Health-Checks und Status im Blick — wir bemerken Probleme zuerst.",false],
+ ["◳","Einfache Skalierung","Mehr Leistung per Klick, wenn dein Bedarf wächst.",false],
+ ["♺","Support","Echte Hilfe von Menschen, die Infrastruktur verstehen.",false]
+];
+const COMPARE=[["Einrichtungszeit","Stunden–Tage","Stunden","< 60 Sekunden"],["Wartung & Betrieb","Du","Du","DynStore"],["Updates","Manuell","Manuell","Automatisch"],["Backups","Selbst bauen","Selbst bauen","Inklusive"],["SSL / HTTPS","Selbst konfig.","Selbst konfig.","Automatisch"],["Monitoring","Selbst bauen","Optional","Inklusive"],["Nötiges Know-how","Hoch","Mittel–Hoch","Keins"]];
+const PRICING=[
+ {name:"Single App",m:4,y:40,tg:"Eine einzelne App, sofort startklar.",cta:"App wählen",fs:["1 gehostete App","Eigene Subdomain + SSL","Automatische Updates","Tägliche Backups","Community-Support"],feat:false},
+ {name:"Stack",m:14,y:140,tg:"Vorkonfigurierte App-Bundles für deinen Use-Case.",cta:"Stack buchen",fs:["3–4 verbundene Apps","Alles aus Single App","Priorisiertes Monitoring","Eigene Domain möglich","E-Mail-Support"],feat:true},
+ {name:"Pro / Team",m:39,y:390,tg:"Mehr Leistung, Team-Zugang & Skalierung.",cta:"Pro starten",fs:["Mehrere Stacks & Apps","Team-Mitglieder & Rollen","Erhöhte Ressourcen","Erweiterte Backups","Prioritäts-Support"],feat:false}
+];
+const SECURITY=[["⛨","Isolierte Instanzen","Jede App in eigener, abgeschotteter Umgebung."],["🔒","Verschlüsselte Verbindungen","SSL/TLS automatisch für jede Instanz."],["⛁","Automatische Backups","Regelmäßig, verschlüsselt, wiederherstellbar."],["◔","Monitoring & Status","Wir bemerken Probleme, bevor du sie merkst."]];
+const FAQS=[
+ ["Was ist DynStore?","DynStore ist eine Plattform für fertig gehostete Self-Hosted-Apps. Du wählst eine App oder einen Stack, buchst sie und bekommst eine vollständig eingerichtete, sichere und aktuelle Instanz — ohne dich um Server, Docker, Updates oder Konfiguration kümmern zu müssen."],
+ ["Brauche ich technische Kenntnisse?","Nein. Wenn du eine Web-App im Browser bedienen kannst, kannst du DynStore nutzen. Die gesamte Technik darunter — Server, Reverse Proxy, SSL, Updates — übernehmen wir."],
+ ["Kann ich meine eigene Domain nutzen?","Ja. Jede Instanz erhält automatisch eine eigene Subdomain mit HTTPS. Eine eigene Domain verbindest du in wenigen Klicks; wir richten das passende Zertifikat automatisch ein."],
+ ["Wie schnell ist eine App bereit?","In der Regel in unter 60 Sekunden. Nach der Buchung provisioniert DynStore die Instanz automatisch und schickt dir die Zugangsdaten."],
+ ["Was passiert bei Updates?","Updates und Sicherheits-Patches spielen wir automatisch ein, schonend und getestet. Du musst nichts tun — und kannst bei größeren Versionssprüngen optional informiert werden."],
+ ["Kann ich Apps kombinieren?","Ja. Du kannst mehrere Apps einzeln buchen oder einen vorkonfigurierten Stack wählen, in dem die Apps bereits miteinander verbunden sind (z. B. Radarr + Prowlarr + Jellyfin)."],
+ ["Gibt es Backups?","Ja. Deine Daten werden regelmäßig und verschlüsselt gesichert. Im Notfall stellen wir wieder her — Backups sind in jedem Plan enthalten."],
+ ["Kann ich später wechseln oder kündigen?","Jederzeit. Du kannst Pläne upgraden, downgraden oder monatlich kündigen. Beim Kündigen kannst du deine Daten vorher exportieren."],
+ ["Ist DynStore legal?","DynStore stellt ausschließlich die Hosting-Infrastruktur und die Software bereit. Welche Inhalte du mit den Apps verarbeitest oder speicherst, liegt in deiner Verantwortung — wie bei jedem anderen Hosting-Anbieter."],
+ ["Wofür bin ich als Nutzer selbst verantwortlich?","Für deine Inhalte und Daten, deine Zugangsdaten und die rechtmäßige Nutzung der Apps. Wir kümmern uns um Betrieb, Updates, Infrastruktur-Sicherheit, Backups und Verfügbarkeit."]
+];
+
+const $=(s,r=document)=>r.querySelector(s);
+const el=(t,c,h)=>{const e=document.createElement(t);if(c)e.className=c;if(h!=null)e.innerHTML=h;return e;};
+document.getElementById("yr").textContent=new Date().getFullYear();
+
+const orbitIcons=["▶","☁","🔒","⚡","◔","▦"];
+const orbit=$("#orbit");
+orbitIcons.forEach((ic,i)=>{const a=i*60*Math.PI/180,R=42,x=50+R*Math.cos(a),y=50+R*Math.sin(a);
+ const n=el("div","node",ic+'<span class="ld"></span>');n.style.left=x+"%";n.style.top=y+"%";orbit.appendChild(n);});
+
+PAINS.forEach(([i,t])=>{$("#pains").appendChild(el("div","pain rv",'<div class="pi">'+i+'</div><div style="margin-top:12px">'+t+'</div>'));});
+STEPS.forEach(([n,i,t,d])=>{$("#steps").appendChild(el("div","step rv",'<div class="top"><span class="ico-sm">'+i+'</span><span class="n">'+n+'</span></div><h3>'+t+'</h3><p>'+d+'</p>'));});
+FEATURES.forEach(([i,t,d,big])=>{$("#features-grid").appendChild(el("div","card feat-ic rv"+(big?" span2":""),'<span class="ico">'+i+'</span><h3>'+t+'</h3><p>'+d+'</p>'));});
+SECURITY.forEach(([i,t,d])=>{$("#security-grid").appendChild(el("div","sc rv",'<i>'+i+'</i><h3>'+t+'</h3><p>'+d+'</p>'));});
+COMPARE.forEach(([f,s,v,d])=>{$("#compare-body").appendChild(el("tr",null,'<td class="f">'+f+'</td><td>'+s+'</td><td>'+v+'</td><td class="dyn"><i>✓</i>'+d+'</td>'));});
+BUNDLES.forEach(b=>{
+ const chips=b.apps.map(a=>'<span class="appchip">'+a+'</span>').join("");
+ const perks=b.perks.map(p=>'<li><span class="tick">✓</span>'+p+'</li>').join("");
+ const btn=b.feat?'<button class="btn btn-primary full">Stack buchen</button>':'<button class="btn btn-ghost full">Stack buchen</button>';
+ $("#bundles-grid").appendChild(el("div","card bundle rv"+(b.feat?" feat":""),
+  (b.feat?'<div style="margin-bottom:12px"><span class="badge acc">Beliebt</span></div>':'')+
+  '<h3>'+b.name+'</h3><p class="aud">'+b.aud+'</p><div class="appchips">'+chips+'</div><ul class="perks">'+perks+'</ul>'+
+  '<div class="pr"><span class="aud" style="display:inline">ab </span><span class="p">'+b.price+' €</span><span class="aud" style="display:inline">/Mon.</span></div><div style="margin-top:16px">'+btn+'</div>'));
+});
+
+let activeCat="Alle",query="";
+CATS.forEach(c=>{const ch=el("button","chip"+(c==="Alle"?" active":""),c);ch.onclick=()=>{activeCat=c;[...$("#chips").children].forEach(x=>x.classList.toggle("active",x.textContent===c));renderApps();};$("#chips").appendChild(ch);});
+$("#q").addEventListener("input",e=>{query=e.target.value.toLowerCase();renderApps();});
+function renderApps(){
+ const g=$("#apps-grid");g.innerHTML="";
+ const list=APPS.filter(a=>(activeCat==="Alle"||a.cat===activeCat)&&(a.name.toLowerCase().includes(query)||a.tags.join(" ").toLowerCase().includes(query)));
+ $("#noapps").style.display=list.length?"none":"block";
+ list.forEach(a=>{
+  const badge=a.status?'<span class="badge '+(a.status==="Beliebt"?"acc":"live")+'">'+(a.status!=="Beliebt"?'<span class="dot"></span>':'')+a.status+'</span>':'<span class="badge live"><span class="dot"></span>Live</span>';
+  const tags=a.tags.map(t=>'<span class="tag">'+t+'</span>').join("");
+  g.appendChild(el("div","card appcard rv in",
+   '<div class="ah"><div class="logo-chip">'+a.ic+'</div>'+badge+'</div>'+
+   '<h3>'+a.name+'</h3><div class="cat">'+a.cat+'</div><p class="desc">'+a.desc+'</p>'+
+   '<div class="tags">'+tags+'</div>'+
+   '<div class="foot"><div class="price"><span class="a">ab </span><span class="p">'+a.price+' €</span><span class="u">/Mon.</span></div><button class="book">Buchen →</button></div>'+
+   '<div class="note">≣ '+a.note+'</div>'));
+ });
+}
+renderApps();
+
+let yearly=false;
+function renderPricing(){
+ const g=$("#pricing-grid");g.innerHTML="";
+ PRICING.forEach(p=>{
+  const amt=yearly?Math.round(p.y/12):p.m;
+  const bill=yearly?(p.y+' € jährlich abgerechnet'):'monatlich abgerechnet';
+  const fs=p.fs.map(f=>'<li><i>✓</i>'+f+'</li>').join("");
+  const btn=p.feat?'<button class="btn btn-primary full">'+p.cta+'</button>':'<button class="btn btn-ghost full">'+p.cta+'</button>';
+  g.appendChild(el("div","plan rv in"+(p.feat?" feat":""),
+   (p.feat?'<div class="ribbon"><span class="badge acc">Empfohlen</span></div>':'')+
+   '<h3>'+p.name+'</h3><p class="tg">'+p.tg+'</p>'+
+   '<div class="amt">'+amt+' €<span> /Mon.</span></div><div class="bill">'+bill+'</div>'+
+   '<ul>'+fs+'</ul><div style="margin-top:auto">'+btn+'</div>'));
+ });
+}
+$("#sw").onclick=()=>{yearly=!yearly;$("#sw").classList.toggle("on",yearly);$("#lblM").className=yearly?"muted":"on-t";$("#lblY").className=yearly?"on-t":"muted";$("#lblY").innerHTML='Jährlich <span class="save">· 2 Monate gratis</span>';renderPricing();};
+renderPricing();
+
+FAQS.forEach(([q,a],i)=>{
+ const item=el("div","qa"+(i===0?" open":""),'<button>'+q+'<span class="chev">⌄</span></button><div class="ans"><p>'+a+'</p></div>');
+ const ans=$(".ans",item);const btn=$("button",item);
+ if(i===0)ans.style.maxHeight=ans.scrollHeight+40+"px";
+ btn.onclick=()=>{const open=item.classList.toggle("open");ans.style.maxHeight=open?ans.scrollHeight+40+"px":"0";};
+ $("#faq-list").appendChild(item);
+});
+
+const io=new IntersectionObserver((es)=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add("in");io.unobserve(e.target);}});},{rootMargin:"-60px"});
+document.querySelectorAll(".rv:not(.in)").forEach(x=>io.observe(x));
+</script>
+</body>
+</html>

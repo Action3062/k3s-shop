@@ -1,0 +1,36 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html { scroll-behavior: smooth; }
+  body {
+    @apply bg-base text-ink font-sans antialiased;
+    line-height: 1.6;
+  }
+  ::selection { background: rgba(34, 211, 238, 0.25); color: #fff; }
+  /* subtle dark scrollbar */
+  * { scrollbar-color: rgba(255,255,255,0.18) transparent; }
+}
+
+@layer utilities {
+  .bg-brand-gradient {
+    background-image: linear-gradient(135deg, #22d3ee 0%, #0ea5e9 100%);
+  }
+  .text-brand-gradient {
+    background-image: linear-gradient(135deg, #22d3ee 0%, #0ea5e9 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  /* ambient radial glows used behind hero / final CTA */
+  .glow-top { background: radial-gradient(900px circle at 70% -10%, rgba(34,211,238,0.10), transparent 60%); }
+  .glow-hero { background: radial-gradient(circle at 50% 45%, rgba(34,211,238,0.18), transparent 60%); }
+  .glow-cta { background: radial-gradient(600px circle at 50% 0%, rgba(34,211,238,0.16), transparent 60%); }
+  .glow-core { box-shadow: 0 0 44px rgba(34,211,238,0.45); }
+  .animate-pulse-dot { animation: pulseDot 1.8s ease-in-out infinite; }
+  @keyframes pulseDot { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.35;transform:scale(.8)} }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; }
+  }
+}
