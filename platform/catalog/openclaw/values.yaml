@@ -43,3 +43,8 @@ webcli:
   enabled: true
   image: ghcr.io/action3062/meinappnest-webcli
   tag: v1
+  # Egress-Freigabe des CLI-Pods zum kube-apiserver (default-deny-Ausnahme)
+  apiServerCidr: 10.0.255.0/24
+  apiServerPort: 6443
+  apiServiceCidr: 10.0.64.1/32
+  apiServicePort: 443
