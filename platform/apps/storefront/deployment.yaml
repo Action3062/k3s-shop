@@ -3,18 +3,18 @@ kind: Deployment
 metadata:
   name: storefront
   namespace: storefront
-  labels: { app: storefront }
+  labels: {app: storefront}
 spec:
   replicas: 1
   selector:
-    matchLabels: { app: storefront }
+    matchLabels: {app: storefront}
   template:
     metadata:
-      labels: { app: storefront }
+      labels: {app: storefront}
     spec:
       containers:
         - name: storefront
-          image: ghcr.io/action3062/dynstore-storefront:sha-a0b0405 # {"$imagepolicy": "flux-system:storefront"}
+          image: ghcr.io/action3062/dynstore-storefront:20260618091356 # {"$imagepolicy": "flux-system:storefront"}
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 3000
@@ -29,9 +29,9 @@ spec:
             - name: NEXT_TELEMETRY_DISABLED
               value: "1"
           readinessProbe:
-            httpGet: { path: /, port: 3000 }
+            httpGet: {path: /, port: 3000}
             initialDelaySeconds: 5
             periodSeconds: 10
           resources:
-            requests: { cpu: "50m", memory: "256Mi" }
-            limits: { cpu: "500m", memory: "512Mi" }
+            requests: {cpu: "50m", memory: "256Mi"}
+            limits: {cpu: "500m", memory: "512Mi"}
