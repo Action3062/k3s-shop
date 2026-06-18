@@ -6,7 +6,7 @@ import { redirect } from "next/navigation";
 import { AuthError } from "next-auth";
 import { prisma } from "@/lib/db";
 import { signIn, signOut, auth } from "@/auth";
-import { startCheckout, serviceAction } from "@/lib/controlPlane";
+import { startCheckout, serviceAction, adminDeprovision } from "@/lib/controlPlane";
 
 const signupSchema = z.object({
   username: z.string().regex(/^[a-z0-9-]{3,40}$/, "username: nur a-z, 0-9, '-', 3–40 Zeichen"),
@@ -91,4 +91,18 @@ export async function regenerateTokenService(formData: FormData) {
   const id = String(formData.get("serviceId") ?? "");
   if (customerId && id) await serviceAction(customerId, id, "regenerate-token").catch(() => null);
   redirect("/dashboard?tokenregenerated=1");
+}
+
+export async function adminDeprovisionService(formData: FormData) {
+  const session = await auth();
+  if (!session) redirect("/login");
+  if ((session.user as { role?: string } | undefined)?.role !== "ADMIN") redirect("/dashboard?error=forbidden");
+  const id = String(formData.get("serviceId") ?? "");
+  const password = String(formData.get("password") ?? "");
+  const email = String(session.user?.email ?? "").toLowerCase();
+  const user = await prisma.user.findUnique({ where: { email } });
+  const ok = user?.passwordHash ? await bcrypt.compare(password, user.passwordHash) : false;
+  if (!ok) redirect("/dashboard?error=pw");
+  if (id) await adminDeprovision(id).catch(() => null);
+  redirect("/dashboard?deleted=1");
 }

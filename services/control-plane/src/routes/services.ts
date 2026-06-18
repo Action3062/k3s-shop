@@ -5,6 +5,7 @@ import { asyncHandler } from '../lib/asyncHandler';
 import { customerContext } from '../middleware/auth';
 import { enqueueJob } from '../services/jobQueue';
 import { scheduleDeprovision, suspendInstance, resumeInstance, restartInstance, reinstallInstance, regenerateGatewayToken } from '../services/lifecycle';
+import { deprovisionInstance } from '../services/provisioner';
 
 export const servicesRouter = Router();
 
@@ -82,6 +83,25 @@ servicesRouter.delete('/services/:id', customerContext, asyncHandler(async (req,
   const inst = await ownedInstance(req, req.params.id);
   const after = await scheduleDeprovision(inst.id);
   res.status(202).json({ scheduled: true, deprovisionAfter: after });
+}));
+
+// ---- admin (Router ist bereits hinter serviceAuth; KEIN customerContext) ----
+servicesRouter.get('/admin/services', asyncHandler(async (_req, res) => {
+  const items = await prisma.serviceInstance.findMany({
+    orderBy: { createdAt: 'desc' },
+    include: { subscription: { include: { customer: { include: { user: true } } } } },
+  });
+  res.json(items.map((i) => ({ ...instanceDto(i), username: i.username, ownerEmail: i.subscription?.customer?.user?.email ?? null })));
+}));
+
+// Loescht einen Server exakt wie das Abo-Ende: Subscription -> CANCELED, dann deprovisionInstance
+// (entfernt das Git-Tenant-Verzeichnis -> Flux pruned Namespace, PVC und alle Workloads).
+servicesRouter.delete('/admin/services/:id', asyncHandler(async (req, res) => {
+  const inst = await prisma.serviceInstance.findUnique({ where: { id: req.params.id } });
+  if (!inst) return res.status(404).json(errorBody('not_found', 'service not found'));
+  await prisma.subscription.update({ where: { id: inst.subscriptionId }, data: { status: 'CANCELED' } }).catch(() => null);
+  await deprovisionInstance(inst.id);
+  res.status(202).json({ ok: true, action: 'deprovision' });
 }));
 
 // ---- internal / admin ----

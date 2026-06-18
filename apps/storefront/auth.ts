@@ -17,18 +17,18 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         if (!user?.passwordHash) return null;
         const ok = await bcrypt.compare(password, user.passwordHash);
         if (!ok) return null;
-        return { id: user.id, email: user.email, name: user.name ?? user.username, customerId: user.customer?.id ?? null } as any;
+        return { id: user.id, email: user.email, name: user.name ?? user.username, customerId: user.customer?.id ?? null, role: user.role } as any;
       },
     }),
   ],
   callbacks: {
     async jwt({ token, user }) {
-      if (user) { (token as any).customerId = (user as any).customerId; (token as any).uid = (user as any).id; }
+      if (user) { (token as any).customerId = (user as any).customerId; (token as any).uid = (user as any).id; (token as any).role = (user as any).role; }
       return token;
     },
     async session({ session, token }) {
       (session as any).customerId = (token as any).customerId ?? null;
-      if (session.user) (session.user as any).id = (token as any).uid ?? null;
+      if (session.user) { (session.user as any).id = (token as any).uid ?? null; (session.user as any).role = (token as any).role ?? "USER"; }
       return session;
     },
   },

@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
-import { logout, startService, stopService, restartService, reinstallService, regenerateTokenService } from "@/app/actions";
-import { getServices, getServiceToken } from "@/lib/controlPlane";
+import { logout, startService, stopService, restartService, reinstallService, regenerateTokenService, adminDeprovisionService } from "@/app/actions";
+import { getServices, getServiceToken, adminListServices } from "@/lib/controlPlane";
 import { TokenField } from "@/components/TokenField";
 
 export const metadata = { title: "Meine Dienste — MeinAppNest" };
@@ -17,6 +17,8 @@ export default async function Dashboard({ searchParams }: { searchParams: { erro
   if (!session) redirect("/login");
   const customerId = (session as { customerId?: string }).customerId ?? "";
   const services = customerId ? await getServices(customerId) : [];
+  const isAdmin = (session.user as { role?: string } | undefined)?.role === "ADMIN";
+  const adminServices = isAdmin ? await adminListServices() : [];
 
   // Gateway-Tokens für OpenClaw-Instanzen laden
   const tokenEntries = await Promise.all(
@@ -97,6 +99,41 @@ export default async function Dashboard({ searchParams }: { searchParams: { erro
               </div>
             );
           })}
+        </div>
+      )}
+      {isAdmin && (
+        <div className="mt-16">
+          <div className="flex items-center gap-2 mb-4">
+            <span className="pill h-7 text-[11px] mono" style={{ borderColor: "#FB7185", color: "#FB7185" }}>ADMIN</span>
+            <h2 className="text-[18px] font-semibold">Alle Server ({adminServices.length})</h2>
+          </div>
+          {adminServices.length === 0 ? (
+            <p className="text-[14px] text-faint">Keine Server vorhanden.</p>
+          ) : (
+            <div className="grid gap-3">
+              {adminServices.map((a) => (
+                <div key={a.id} className="card flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <b className="text-[15px]">{a.subdomain ?? a.name}</b>
+                      <span className="pill h-6 text-[10px] mono">{a.appSlug}</span>
+                      <span className="pill h-6 text-[10px] mono">{a.status}</span>
+                    </div>
+                    <p className="mono text-[11px] text-faint mt-1 truncate">{a.ownerEmail ?? a.username} · {a.namespace}</p>
+                  </div>
+                  <details className="rounded-xl border border-red-500/20 bg-red-500/5 px-3 sm:min-w-[360px]">
+                    <summary className="py-2.5 text-[13px] text-red-400 cursor-pointer list-none">🗑 Server löschen <span className="text-faint font-normal">(entfernt Namespace, Daten &amp; Abo)</span></summary>
+                    <form action={adminDeprovisionService} className="pb-3 flex flex-col sm:flex-row gap-2 sm:items-end">
+                      <input type="hidden" name="serviceId" value={a.id} />
+                      <label className="flex-1"><span className="block text-[11px] text-muted mb-1">Dein Admin-Passwort</span>
+                        <input name="password" type="password" required placeholder="Passwort" className="w-full h-9 px-3 rounded-lg bg-surface border border-line2 text-ink outline-none focus:border-red-400" /></label>
+                      <button type="submit" className="btn h-9 px-4 text-[13px] font-semibold" style={{ background: "#FB7185", color: "#1A0A0D" }}>Endgültig löschen</button>
+                    </form>
+                  </details>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
     </section>

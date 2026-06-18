@@ -70,3 +70,19 @@ export async function getServiceToken(customerId: string, id: string): Promise<s
     return null;
   }
 }
+
+export type AdminServiceInstance = ServiceInstance & {
+  username?: string; ownerEmail?: string | null; subdomain?: string; namespace?: string;
+};
+
+export async function adminListServices(): Promise<AdminServiceInstance[]> {
+  if (!BASE) return [];
+  try { return await cp<AdminServiceInstance[]>("/v1/admin/services"); }
+  catch { return []; }
+}
+
+export async function adminDeprovision(id: string): Promise<boolean> {
+  if (!BASE) return false;
+  try { await cp(`/v1/admin/services/${id}`, { method: "DELETE" }); return true; }
+  catch { return false; }
+}
