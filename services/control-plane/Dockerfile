@@ -1,6 +1,7 @@
 # ---- build ----
 FROM node:22-alpine AS build
 WORKDIR /app
+RUN apk add --no-cache openssl
 COPY package.json ./
 RUN npm install
 COPY tsconfig.json ./
@@ -8,10 +9,10 @@ COPY prisma ./prisma
 RUN npx prisma generate
 COPY src ./src
 RUN npm run build
-
 # ---- runtime ----
 FROM node:22-alpine
 WORKDIR /app
+RUN apk add --no-cache openssl
 ENV NODE_ENV=production
 COPY package.json ./
 RUN npm install --omit=dev
