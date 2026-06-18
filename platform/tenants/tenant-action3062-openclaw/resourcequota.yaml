@@ -7,8 +7,8 @@ spec:
   hard:
     requests.cpu: "1"
     requests.memory: "2Gi"
-    limits.cpu: "1"
-    limits.memory: "2048Mi"
+    limits.cpu: "1500m"
+    limits.memory: "3072Mi"
     requests.storage: "10Gi"
     persistentvolumeclaims: "2"
     count/deployments.apps: "3"

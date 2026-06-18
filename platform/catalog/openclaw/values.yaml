@@ -38,3 +38,8 @@ dataVersion: 1           # Hochzählen = frisches Volume (Neuinstallation)
 gate:
   enabled: true
   verifyUrl: http://storefront.storefront.svc.cluster.local/api/gate/verify
+
+webcli:
+  enabled: true
+  image: ghcr.io/action3062/meinappnest-webcli
+  tag: v1

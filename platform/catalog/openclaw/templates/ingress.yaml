@@ -16,6 +16,15 @@ spec:
     - host: {{ include "openclaw.host" . }}
       http:
         paths:
+          {{- if .Values.webcli.enabled }}
+          - path: /cli
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ include "openclaw.fullname" . }}-cli
+                port:
+                  number: 80
+          {{- end }}
           - path: /
             pathType: Prefix
             backend:

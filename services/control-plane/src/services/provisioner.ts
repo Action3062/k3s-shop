@@ -43,8 +43,15 @@ export async function provisionInstance(instanceId: string): Promise<void> {
     app: inst.appSlug,
     cpuRequest: plan.cpuLimit ?? '1',
     memRequest: plan.memLimitMi ? `${plan.memLimitMi}Mi` : '1Gi',
-    cpuLimit: plan.cpuLimit ?? '1',
-    memLimit: plan.memLimitMi ? `${plan.memLimitMi}Mi` : '1Gi',
+    // OpenClaw betreibt zusaetzlich einen Web-CLI-Sidecar (eigenes Deployment) -> Quota-Puffer
+    cpuLimit:
+      inst.appSlug === 'openclaw'
+        ? `${(plan.cpuLimit && plan.cpuLimit.endsWith('m') ? parseInt(plan.cpuLimit) : Math.round(parseFloat(plan.cpuLimit ?? '1') * 1000)) + 500}m`
+        : plan.cpuLimit ?? '1',
+    memLimit:
+      inst.appSlug === 'openclaw'
+        ? `${(plan.memLimitMi ?? 1024) + 1024}Mi`
+        : plan.memLimitMi ? `${plan.memLimitMi}Mi` : '1Gi',
     storage: `${inst.storageGi}Gi`,
   });
   const helmRelease = renderHelmRelease({

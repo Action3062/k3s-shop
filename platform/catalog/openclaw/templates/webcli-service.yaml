@@ -1,0 +1,12 @@
+{{- if .Values.webcli.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "openclaw.fullname" . }}-cli
+spec:
+  selector:
+    app: {{ include "openclaw.fullname" . }}-cli
+  ports:
+    - port: 80
+      targetPort: 7681
+{{- end }}
