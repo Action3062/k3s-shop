@@ -68,11 +68,15 @@ export default async function Dashboard({ searchParams }: { searchParams: { erro
                       <form action={regenerateTokenService}><input type="hidden" name="serviceId" value={s.id} /><button className="text-[12px] text-accent-ink hover:underline" type="submit">Neu generieren</button></form>
                     </div>
                     {token ? <TokenField token={token} /> : <span className="text-[13px] text-faint">Token wird erstellt…</span>}
+                    <p className="mt-3 text-[11px] text-faint leading-relaxed">Provider verbinden im <b className="text-ink">OpenCLI</b>-Terminal, z. B.:<br /><code className="mono text-accent-ink">openclaw models auth login --provider openai-codex</code></p>
                   </div>
                 )}
 
                 <div className="flex flex-wrap gap-2 mt-5 pt-4 border-t border-line">
-                  <a href={s.url} className="btn btn-ghost h-9 px-4 text-[14px]">Öffnen</a>
+                  <a href={s.url} target="_blank" rel="noopener" className="btn btn-ghost h-9 px-4 text-[14px]">Öffnen</a>
+                  {s.appSlug === "openclaw" && (
+                    <a href={`${s.url.replace(/\/$/, "")}/cli/`} target="_blank" rel="noopener" className="btn btn-ghost h-9 px-4 text-[14px]">OpenCLI ⌨</a>
+                  )}
                   {running ? (
                     <form action={stopService}><input type="hidden" name="serviceId" value={s.id} /><button className="btn btn-ghost h-9 px-4 text-[14px]">Stoppen</button></form>
                   ) : (
