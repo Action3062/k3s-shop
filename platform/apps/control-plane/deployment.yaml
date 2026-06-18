@@ -18,6 +18,9 @@ spec:
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8080
+          env:
+            - name: SOPS_AGE_RECIPIENT
+              value: "age1v692qut43hq0k07jz6afe75txgtjjpffe0nsyw9qx55p8s5qj50scylpqu"
           envFrom:
             - secretRef: {name: control-plane-runtime}
           readinessProbe:
