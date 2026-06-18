@@ -1,37 +1,33 @@
 import Link from "next/link";
 import type { CatalogApp } from "@/lib/types";
 
-const MARKS: Record<string, string> = {
-  vaultwarden: "linear-gradient(135deg,#3b82f6,#1d4ed8)",
-  nextcloud: "linear-gradient(135deg,#0ea5e9,#0369a1)",
-  jellyfin: "linear-gradient(135deg,#a855f7,#6d28d9)",
+const HUE: Record<string, string> = {
+  vaultwarden: "#34D399", nextcloud: "#38BDF8", jellyfin: "#A78BFA", plex: "#A78BFA",
+  n8n: "#FBBF24", radarr: "#FBBF24", sonarr: "#FBBF24", "uptime-kuma": "#F472B6", homepage: "#22D3EE",
 };
 
 export function AppCard({ app, available }: { app: CatalogApp; available?: boolean }) {
   const plan = app.plans[0];
   const price = plan ? (plan.priceCents / 100).toFixed(0) : "—";
+  const hue = HUE[app.slug] ?? "#22D3EE";
   return (
-    <div className={`relative card rounded-2xl transition hover:-translate-y-0.5 hover:border-line2 ${available ? "" : "opacity-60"}`}>
-      <span className={available ? "absolute top-4 right-4 text-[11px] font-medium text-bg rounded-full px-2.5 py-0.5" : "absolute top-4 right-4 text-[11px] text-faint border border-line rounded-full px-2.5 py-0.5"}
-        style={available ? { background: "linear-gradient(135deg,#22d3ee,#0ea5e9)" } : undefined}>
-        {available ? "Verfügbar" : "Bald"}
-      </span>
-      <div className="flex items-center gap-3 mb-3.5">
-        <div className="grid place-items-center w-[46px] h-[46px] rounded-xl font-bold text-[18px] text-bg" style={{ background: MARKS[app.slug] ?? "linear-gradient(135deg,#22d3ee,#0ea5e9)" }}>
-          {app.name.charAt(0)}
-        </div>
-        <div>
-          <b className="block text-base">{app.name}</b>
-          <span className="text-[12.5px] text-faint">{app.category}</span>
-        </div>
+    <article className={`card card-hover group flex flex-col ${available ? "" : "opacity-70"}`}>
+      <div className="flex items-start justify-between">
+        <span className="grid place-items-center h-11 w-11 rounded-xl text-[15px] mono font-semibold transition-transform group-hover:scale-105" style={{ background: `${hue}1f`, color: hue }}>{app.name.charAt(0)}</span>
+        <span className="pill h-7 text-[11px] mono">
+          <span className="dot pulse-soft" style={{ background: available ? "#34D399" : "#65788A", boxShadow: available ? "0 0 8px #34D399" : "none" }} />
+          {available ? "Verfügbar" : "Bald"}
+        </span>
       </div>
-      <p className="text-sm text-muted min-h-[42px]">{app.description}</p>
-      <div className="flex items-center justify-between mt-4 pt-4 border-t border-line">
-        <span><b className="text-xl">{price}&nbsp;€</b><span className="text-faint text-[13px]"> / Monat</span></span>
+      <h3 className="mt-4 text-[16px] font-semibold">{app.name}</h3>
+      <p className="mono text-[11px] text-faint uppercase tracking-wider">{app.category}</p>
+      <p className="mt-2 text-[14px] leading-[1.6] text-muted">{app.description}</p>
+      <div className="mt-5 flex items-center justify-between border-t border-line pt-4">
+        <span className="mono text-[13px]">ab <span className="text-accent-ink">{price} €</span>/Mon.</span>
         {available
-          ? <Link href={`/catalog/${app.slug}`} className="btn btn-primary h-9 px-4">Abonnieren</Link>
-          : <Link href="/signup" className="btn btn-ghost h-9 px-4">Benachrichtigen</Link>}
+          ? <Link href={`/catalog/${app.slug}`} className="btn btn-primary h-9 px-4 text-[14px]">Abonnieren</Link>
+          : <Link href="/signup" className="btn btn-ghost h-9 px-4 text-[14px]">Benachrichtigen</Link>}
       </div>
-    </div>
+    </article>
   );
 }

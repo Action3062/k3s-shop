@@ -1,31 +1,34 @@
 import Link from "next/link";
 
 export function Footer() {
+  const cols: Record<string, [string, string][]> = {
+    Produkt: [["Apps", "/catalog"], ["Preise", "/pricing"], ["Anmelden", "/signup"]],
+    Rechtliches: [["Impressum", "/impressum"], ["Datenschutz", "/datenschutz"], ["AGB", "/agb"]],
+  };
   return (
-    <footer className="border-t border-line py-12 text-faint text-sm">
-      <div className="wrap">
-        <div className="flex flex-wrap justify-between gap-8 mb-7">
-          <div className="flex items-center gap-2.5 font-medium text-ink">
-            <span className="grid place-items-center w-7 h-7 rounded-lg text-bg font-bold text-[15px]" style={{ background: "linear-gradient(135deg,#22d3ee,#0ea5e9)" }}>D</span>
-            MeinAppNest
+    <footer className="border-t border-line mt-12">
+      <div className="wrap py-14">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-10">
+          <div>
+            <div className="flex items-center gap-2 font-semibold"><span className="chip h-7 w-7 text-[15px]">◧</span>MeinAppNest</div>
+            <p className="mt-3 text-[13px] leading-[1.6] text-faint max-w-[240px]">Deine Lieblings-Apps, fertig gehostet. Self-hosted Power, ohne Self-hosting Stress.</p>
           </div>
-          <FCol title="Produkt" links={[["Apps", "/catalog"], ["Preise", "/pricing"], ["So funktioniert's", "/#how"]]} />
-          <FCol title="Konto" links={[["Login", "/login"], ["Registrieren", "/signup"], ["Dashboard", "/dashboard"]]} />
-          <FCol title="Rechtliches" links={[["Impressum", "/impressum"], ["AGB", "/agb"], ["Datenschutz", "/datenschutz"]]} />
+          {Object.entries(cols).map(([h, links]) => (
+            <div key={h}>
+              <p className="mono text-[11px] uppercase tracking-wider text-faint mb-3">{h}</p>
+              <ul className="space-y-2">{links.map(([l, href]) => <li key={l}><Link href={href} className="text-[14px] text-muted hover:text-accent-ink">{l}</Link></li>)}</ul>
+            </div>
+          ))}
+          <div>
+            <p className="mono text-[11px] uppercase tracking-wider text-faint mb-3">Status</p>
+            <p className="inline-flex items-center gap-2 mono text-[12px] text-muted"><span className="dot bg-ok pulse-soft" /> Alle Systeme betriebsbereit</p>
+          </div>
         </div>
-        <div>© 2026 MeinAppNest · Gehostet in Deutschland</div>
+        <div className="mt-12 pt-6 border-t border-line flex flex-col sm:flex-row items-center justify-between gap-3">
+          <p className="mono text-[12px] text-faint">© 2026 MeinAppNest · Gehostet in Deutschland</p>
+          <p className="mono text-[12px] text-faint">Self-hosted Power. Ohne Self-hosting Stress.</p>
+        </div>
       </div>
     </footer>
-  );
-}
-
-function FCol({ title, links }: { title: string; links: [string, string][] }) {
-  return (
-    <div>
-      <b className="block text-[13px] text-ink mb-2 font-medium">{title}</b>
-      {links.map(([label, href]) => (
-        <Link key={href} href={href} className="block text-muted hover:text-ink py-1">{label}</Link>
-      ))}
-    </div>
   );
 }

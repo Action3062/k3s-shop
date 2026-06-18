@@ -4,24 +4,45 @@
 
 :root { color-scheme: dark; --font-sans: 'Inter'; --font-mono: 'JetBrains Mono'; }
 html { scroll-behavior: smooth; }
-body { background: #07090C; color: #EBF1F6; line-height: 1.6; }
-::selection { background: rgba(34, 211, 238, 0.25); color: #fff; }
+body { background: #07090C; color: #EBF1F6; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+::selection { background: rgba(34,211,238,.25); color: #fff; }
 
 @layer components {
   .wrap { @apply max-w-content mx-auto px-6; }
-  .btn { @apply inline-flex items-center justify-center gap-2 h-11 px-5 rounded-[12px] font-medium text-[15px] border border-line2 transition; }
-  .btn-primary { @apply text-[#04181C] border-transparent font-semibold; background: linear-gradient(135deg, #22d3ee 0%, #0ea5e9 100%); }
-  .btn-primary:hover { filter: brightness(1.06); }
-  .btn-ghost:hover { @apply bg-surface border-line2; }
-  .pill { @apply inline-flex items-center gap-2 h-[30px] px-3 border border-line rounded-full text-[13px] text-muted bg-bg2; }
-  .dot { @apply w-[7px] h-[7px] rounded-full bg-ok; box-shadow: 0 0 0 4px rgba(52,211,153,.15); }
-  .eyebrow { @apply text-accent-ink font-medium text-[13px] uppercase; letter-spacing: 0.12em; }
-  .card { @apply bg-surface border border-line rounded-[20px] p-6; }
-  .section { @apply py-[84px] border-t border-line; }
+  .section { @apply py-24; }
+  .eyebrow { @apply font-mono text-[12px] tracking-[0.18em] uppercase text-accent-ink; }
+
+  .btn { @apply inline-flex items-center justify-center gap-2 h-11 px-5 rounded-xl font-semibold text-[15px] transition-all duration-200; }
+  .btn:active { transform: scale(.98); }
+  .btn-primary { @apply text-[#04181C] border-transparent; background: linear-gradient(135deg,#22d3ee,#06b6d4); }
+  .btn-primary:hover { filter: brightness(1.08); box-shadow: 0 8px 40px rgba(34,211,238,.22); }
+  .btn-ghost { @apply text-ink border border-line2; }
+  .btn-ghost:hover { border-color: rgba(34,211,238,.4); background: #11171E; }
+
+  .card { @apply rounded-2xl border border-line2 bg-bg2 p-5; box-shadow: 0 1px 0 rgba(255,255,255,.04) inset, 0 8px 24px rgba(0,0,0,.35); }
+  .card-hover { @apply transition-all duration-200; }
+  .card-hover:hover { transform: translateY(-4px); border-color: rgba(34,211,238,.35); box-shadow: 0 12px 40px rgba(0,0,0,.45), 0 0 0 1px rgba(34,211,238,.25); }
+
+  .chip { @apply grid place-items-center h-11 w-11 rounded-xl text-[15px] font-mono font-semibold; background: rgba(34,211,238,.12); color: #67E8F9; }
+  .pill { @apply inline-flex items-center gap-2 h-7 px-3 rounded-full border border-line2 text-[12px] text-muted; }
+  .tag { @apply font-mono text-[11px] px-2 py-0.5 rounded-md bg-surface border border-line text-muted; }
+  .dot { @apply h-1.5 w-1.5 rounded-full; }
+  .glow-hero { background: radial-gradient(circle, rgba(34,211,238,.14), transparent 65%); }
+
+  details.faq { @apply border-b border-line; }
+  details.faq > summary { @apply flex items-center justify-between gap-4 py-5 cursor-pointer list-none text-[16px] font-medium text-ink; }
+  details.faq > summary::-webkit-details-marker { display: none; }
+  details.faq > summary::after { content: "⌄"; @apply text-faint transition-transform duration-300; }
+  details.faq[open] > summary::after { transform: rotate(180deg); color: #67E8F9; }
+  details.faq > div { @apply pb-5 text-[15px] leading-[1.7] text-muted; }
 }
 
 @layer utilities {
-  .text-brand-gradient { background-image: linear-gradient(135deg,#22d3ee,#0ea5e9); -webkit-background-clip: text; background-clip: text; color: transparent; }
-  .glow-hero { background: radial-gradient(circle at 50% 40%, rgba(34,211,238,.16), transparent 60%); }
-  .glow-top  { background: radial-gradient(900px circle at 72% -10%, rgba(34,211,238,.10), transparent 60%); }
+  .mono { font-family: var(--font-mono), ui-monospace, monospace; }
+  .spin-slow { animation: mn-spin 80s linear infinite; }
+  .spin-rev { animation: mn-spin 80s linear infinite reverse; }
+  .pulse-soft { animation: mn-pulse 2s ease-in-out infinite; }
 }
+@keyframes mn-spin { to { transform: rotate(360deg); } }
+@keyframes mn-pulse { 0%,100% { opacity: 1; } 50% { opacity: .45; } }
+@media (prefers-reduced-motion: reduce) { .spin-slow,.spin-rev,.pulse-soft { animation: none; } }
