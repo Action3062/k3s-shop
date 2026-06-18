@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: storefront
-          image: ghcr.io/action3062/dynstore-storefront:20260618091356 # {"$imagepolicy": "flux-system:storefront"}
+          image: ghcr.io/action3062/dynstore-storefront:20260618093413 # {"$imagepolicy": "flux-system:storefront"}
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 3000
@@ -25,7 +25,7 @@ spec:
               value: "1"
           envFrom:
             - secretRef:
-                name: storefront-runtime   # DATABASE_URL + AUTH_SECRET (out-of-band Secret)
+                name: storefront-runtime # DATABASE_URL + AUTH_SECRET (out-of-band Secret)
           readinessProbe:
             httpGet: {path: /, port: 3000}
             initialDelaySeconds: 5
