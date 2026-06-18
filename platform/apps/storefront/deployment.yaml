@@ -23,6 +23,10 @@ spec:
               value: "https://store.meinappnest.org"
             - name: NEXT_TELEMETRY_DISABLED
               value: "1"
+            - name: AUTH_TRUST_HOST
+              value: "true"
+            - name: AUTH_URL
+              value: "https://store.meinappnest.org"
           envFrom:
             - secretRef:
                 name: storefront-runtime # DATABASE_URL + AUTH_SECRET (out-of-band Secret)
