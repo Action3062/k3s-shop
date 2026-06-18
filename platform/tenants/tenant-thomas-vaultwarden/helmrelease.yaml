@@ -17,8 +17,9 @@ spec:
   values:
     username: thomas
     appName: vaultwarden
-    baseDomain: dyndnsv4.de
+    baseDomain: meinappnest.org
     replicas: 1
     storage: { size: 5Gi }
     ingress:
-      certIssuer: letsencrypt-prod
+      certIssuer: ""              # leer => kein HTTP-01 pro Host
+      useDefaultWildcardCert: false  # => Secret wildcard-vaultwarden-tls (von Reflector gespiegelt)

@@ -1,7 +1,7 @@
 # Pro-Tenant-Werte injiziert die Control-Plane über die HelmRelease.
 username: ""             # DNS-Label des Kunden (bei Registrierung gewählt)
 appName: vaultwarden     # App-Label in der Domain
-baseDomain: dyndnsv4.de  # Host = <username>.<appName>.<baseDomain>
+baseDomain: meinappnest.org  # Host = <username>.<appName>.<baseDomain>
 
 replicas: 1              # 0 = suspendiert
 

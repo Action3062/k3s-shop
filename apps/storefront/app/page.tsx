@@ -43,7 +43,7 @@ export default async function Home() {
           <p className="text-muted max-w-[60ch] mb-9">Du klickst „Abonnieren". Wir kümmern uns um Ausrollen, TLS, Isolation und Lebenszyklus.</p>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-[18px]">
             <Feature icon="⚡" title="In Minuten live" body="Nach dem Kauf wird deine Instanz automatisch ausgerollt — kein manuelles Setup." />
-            <Feature icon="🔒" title="Eigene Domain + HTTPS" body="Jede Instanz unter name.app.dyndnsv4.de mit gültigem Zertifikat." />
+            <Feature icon="🔒" title="Eigene Domain + HTTPS" body="Jede Instanz unter name.app.meinappnest.org mit gültigem Zertifikat." />
             <Feature icon="🧩" title="Sauber getrennt" body="Eigener Namespace, Ressourcen-Limits und Netzwerk-Isolation pro Kunde." />
             <Feature icon="↺" title="Volle Kontrolle" body="Verwalten, pausieren oder kündigen — mit Backup vor jeder Löschung." />
           </div>
@@ -107,7 +107,7 @@ function DemoCard() {
         </div>
       ))}
       <div className="mt-3.5 bg-bg2 border border-line rounded-xl px-4 py-3.5 flex items-center justify-between">
-        <span className="font-mono text-[13.5px] text-accent-ink">https://thomas.vaultwarden.dyndnsv4.de</span>
+        <span className="font-mono text-[13.5px] text-accent-ink">https://thomas.vaultwarden.meinappnest.org</span>
         <span className="pill h-[26px]"><span className="dot" /> live</span>
       </div>
     </div>

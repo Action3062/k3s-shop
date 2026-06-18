@@ -1,6 +1,7 @@
-# EIN Wildcard-Zertifikat PRO APP — deckt alle <username>.vaultwarden.dyndnsv4.de ab.
-# Zentral in cert-manager ausgestellt, via Reflector in die Tenant-Namespaces gespiegelt.
-# Für jede weitere App eine Kopie mit angepasstem Namen/dnsNames anlegen.
+# EIN Wildcard-Zertifikat PRO APP — deckt alle <username>.vaultwarden.meinappnest.org ab.
+# Zentral in cert-manager via Cloudflare DNS-01 ausgestellt, per Reflector in die
+# Tenant-Namespaces (tenant-*-vaultwarden) als Secret 'wildcard-vaultwarden-tls' gespiegelt.
+# Fuer jede weitere App eine Kopie mit angepasstem Namen/dnsNames anlegen.
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
@@ -11,11 +12,12 @@ spec:
   secretTemplate:
     annotations:
       reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
+      reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces: "tenant-.*-vaultwarden"
       reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
       reflector.v1.k8s.emberstack.com/reflection-auto-namespaces: "tenant-.*-vaultwarden"
   issuerRef:
-    name: letsencrypt-dyndnsv4
+    name: letsencrypt-cloudflare
     kind: ClusterIssuer
-  commonName: "*.vaultwarden.dyndnsv4.de"
+  commonName: "*.vaultwarden.meinappnest.org"
   dnsNames:
-    - "*.vaultwarden.dyndnsv4.de"
+    - "*.vaultwarden.meinappnest.org"

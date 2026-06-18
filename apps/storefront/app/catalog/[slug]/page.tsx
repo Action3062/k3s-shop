@@ -30,7 +30,7 @@ export default async function AppDetail({ params }: { params: { slug: string } }
           <span className="text-faint text-sm">{plan?.storageGi} GB Speicher</span>
         </div>
         <ul className="mt-4 text-sm text-muted space-y-2">
-          <li>Eigene Subdomain unter <span className="font-mono text-[13px]">&lt;username&gt;.{app.slug}.dyndnsv4.de</span></li>
+          <li>Eigene Subdomain unter <span className="font-mono text-[13px]">&lt;username&gt;.{app.slug}.meinappnest.org</span></li>
           <li>Automatisches HTTPS · tägliche Backups · jederzeit kündbar</li>
         </ul>
         {available && plan ? (

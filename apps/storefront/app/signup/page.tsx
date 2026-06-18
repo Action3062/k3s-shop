@@ -7,7 +7,7 @@ export default function Signup({ searchParams }: { searchParams: { error?: strin
   return (
     <section className="wrap py-20 max-w-md">
       <h1 className="font-semibold tracking-tight text-[32px] mb-2">Konto erstellen</h1>
-      <p className="text-muted mb-8">Dein Username wird Teil deiner App-Adresse: <span className="font-mono text-[13px]">username.app.dyndnsv4.de</span></p>
+      <p className="text-muted mb-8">Dein Username wird Teil deiner App-Adresse: <span className="font-mono text-[13px]">username.app.meinappnest.org</span></p>
       {searchParams.error === "exists" && <Note>E-Mail oder Username bereits vergeben.</Note>}
       {searchParams.error === "validation" && <Note>Bitte Eingaben prüfen (Username: a–z, 0–9, „-", min. 8 Zeichen Passwort).</Note>}
       <form action={signup} className="space-y-4">

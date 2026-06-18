@@ -1,5 +1,8 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
-resources: []
-# cert-manager (DNS-01 Wildcard) + reflector werden aktiviert, sobald PowerDNS-TSIG vorliegt.
-# Siehe cert-manager/ (Manifeste liegen bereit).
+resources:
+  - cert-manager
+# Cluster-Prereqs (out-of-band installiert, NICHT Flux-verwaltet):
+#  - cert-manager
+#  - reflector (emberstack) — spiegelt wildcard-vaultwarden-tls in tenant-*-vaultwarden
+#  - Secret cloudflare-api-token (ns cert-manager) — KEIN Secret im Git

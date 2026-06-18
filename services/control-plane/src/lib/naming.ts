@@ -16,7 +16,7 @@ export interface TenantNaming {
   url: string;
 }
 
-/** Domain-Schema: <username>.<appname>.<baseDomain>  (z. B. thomas.vaultwarden.dyndnsv4.de) */
+/** Domain-Schema: <username>.<appname>.<baseDomain>  (z. B. thomas.vaultwarden.meinappnest.org) */
 export function tenantNames(opts: {
   username: string;
   appSlug: string;

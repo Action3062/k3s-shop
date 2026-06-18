@@ -7,8 +7,8 @@ const schema = z.object({
   DATABASE_URL: z.string(),
   CP_SERVICE_TOKEN: z.string().min(1),
 
-  APPS_BASE_DOMAIN: z.string().default('dyndnsv4.de'),
-  STOREFRONT_URL: z.string().default('https://store.dyndnsv4.de'),
+  APPS_BASE_DOMAIN: z.string().default('meinappnest.org'),
+  STOREFRONT_URL: z.string().default('https://store.meinappnest.org'),
   DEPROVISION_GRACE_DAYS: z.coerce.number().default(14),
   PROVISION_MODE: z.enum(['gitops', 'kubectl']).default('gitops'),
 
@@ -23,7 +23,7 @@ const schema = z.object({
   // Stripe (optional bis Phase 4 konfiguriert)
   STRIPE_SECRET_KEY: z.string().optional(),
   STRIPE_WEBHOOK_SECRET: z.string().optional(),
-  STRIPE_PORTAL_RETURN_URL: z.string().default('https://store.dyndnsv4.de/dashboard'),
+  STRIPE_PORTAL_RETURN_URL: z.string().default('https://store.meinappnest.org/dashboard'),
 
   // Load Balancer (Ziel der Tenant-Records)
   LB_IPV4: z.string().default('91.98.1.85'),
