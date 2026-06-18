@@ -6,6 +6,7 @@ import { customerContext } from '../middleware/auth';
 import { enqueueJob } from '../services/jobQueue';
 import { scheduleDeprovision, suspendInstance, resumeInstance, restartInstance, reinstallInstance, regenerateGatewayToken } from '../services/lifecycle';
 import { deprovisionInstance } from '../services/provisioner';
+import { getDeploymentStatus, computeLiveStatus } from '../services/kubeStatus';
 
 export const servicesRouter = Router();
 
@@ -32,16 +33,21 @@ async function ownedInstance(req: unknown, id: string) {
   return inst;
 }
 
+async function withLiveStatus<T extends { status: string; namespace: string; appSlug: string }>(i: T) {
+  const st = await getDeploymentStatus(i.namespace, i.appSlug);
+  return { ...instanceDto(i as never), status: computeLiveStatus(i.status, st) };
+}
+
 // ---- customer-facing ----
 servicesRouter.get('/me/services', customerContext, asyncHandler(async (req, res) => {
   const customerId = (req as { customerId?: string }).customerId!;
   const items = await prisma.serviceInstance.findMany({ where: { subscription: { customerId } }, orderBy: { createdAt: 'desc' } });
-  res.json(items.map(instanceDto));
+  res.json(await Promise.all(items.map(withLiveStatus)));
 }));
 
 servicesRouter.get('/services/:id', customerContext, asyncHandler(async (req, res) => {
   const inst = await ownedInstance(req, req.params.id);
-  res.json(instanceDto(inst));
+  res.json(await withLiveStatus(inst));
 }));
 
 servicesRouter.post('/services/:id/start', customerContext, asyncHandler(async (req, res) => {
@@ -91,7 +97,7 @@ servicesRouter.get('/admin/services', asyncHandler(async (_req, res) => {
     orderBy: { createdAt: 'desc' },
     include: { subscription: { include: { customer: { include: { user: true } } } } },
   });
-  res.json(items.map((i) => ({ ...instanceDto(i), username: i.username, ownerEmail: i.subscription?.customer?.user?.email ?? null })));
+  res.json(await Promise.all(items.map(async (i) => ({ ...(await withLiveStatus(i)), username: i.username, ownerEmail: i.subscription?.customer?.user?.email ?? null }))));
 }));
 
 // Loescht einen Server exakt wie das Abo-Ende: Subscription -> CANCELED, dann deprovisionInstance

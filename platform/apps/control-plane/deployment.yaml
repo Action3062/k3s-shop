@@ -12,6 +12,7 @@ spec:
     metadata:
       labels: {app: control-plane}
     spec:
+      serviceAccountName: control-plane
       containers:
         - name: control-plane
           image: ghcr.io/action3062/dynstore-control-plane:20260618161832
