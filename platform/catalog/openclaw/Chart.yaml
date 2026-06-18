@@ -3,4 +3,4 @@ name: openclaw
 description: OpenClaw Gateway – managed, isolierte Tenant-Instanz (MeinAppNest)
 type: application
 version: 0.1.0
-appVersion: "2026.2.26"
+appVersion: "2026.6.8"

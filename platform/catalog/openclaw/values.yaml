@@ -7,7 +7,7 @@ replicas: 1              # 0 = suspendiert
 
 image:
   repository: ghcr.io/openclaw/openclaw
-  tag: "2026.2.26"       # offizielles GHCR-Image (Tags: main|latest|<version>)
+  tag: "2026.6.8"       # offizielles GHCR-Image (Tags: main|latest|<version>)
   pullPolicy: IfNotPresent
 
 # OpenClaw lauscht auf 18789 (Gateway + Control-UI)
