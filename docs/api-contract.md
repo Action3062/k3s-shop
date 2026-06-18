@@ -44,7 +44,7 @@ Status: **Entwurf (Phase 0)**. Base URL der Control-Plane: `CONTROL_PLANE_URL` (
   "appSlug": "vaultwarden",
   "name": "string",
   "status": "RUNNING",
-  "url": "https://thomas.vaultwarden.dyndnsv4.de",
+  "url": "https://thomas.vaultwarden.meinappnest.org",
   "subdomain": "thomas.vaultwarden",
   "namespace": "tenant-thomas-vaultwarden",
   "storageGi": 5,

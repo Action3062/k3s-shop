@@ -75,3 +75,13 @@ Pro Kunde/Dienst ein Namespace + ResourceQuota + LimitRange + NetworkPolicy (def
 - Betreiber betreibt dynDNSv4 **selbst** (PowerDNS-Backend, volle Kontrolle).
 - **DNS:** Wildcard **pro App** `*.<appname>.dyndnsv4.de → 91.98.1.85` (einmalig je App), kein DNS-Call pro Tenant (`DNS_MODE=wildcard-per-app`). dynDNSv4 spricht dyndns2 für A/AAAA-Updates.
 - **TLS:** cert-manager **DNS-01 via RFC2136/TSIG gegen PowerDNS** (`letsencrypt-dyndnsv4`), Wildcard-Cert je App, per Reflector in Tenant-NS gespiegelt. (acme-dns/Webhook verworfen — direkter PowerDNS-Weg ist robuster, da Betreiber die DNS kontrolliert.)
+
+## Update (2026-06-18) — Produktiv-Domain meinappnest.org via Cloudflare DNS-01 (Cutover vollzogen)
+
+Ersetzt die vorherigen DNS/TLS-Festlegungen (dynDNSv4 / PowerDNS-RFC2136). Grund: PowerDNS bot kein TSIG; die Produktiv-Domain `meinappnest.org` liegt bei **Cloudflare**, das DNS-01 sauber unterstuetzt.
+
+- **Domain:** Produktiv-Schema `<username>.<appname>.meinappnest.org`; Storefront `store.meinappnest.org`. (`*.dyndnsv4.de` war Provisorium — stillgelegt.)
+- **DNS:** Cloudflare (Registrar + DNS). Records "DNS only" (grau): `store`, `*.vaultwarden`, Apex -> `91.98.1.85`. Wildcard pro App einmalig.
+- **TLS:** cert-manager **DNS-01 via Cloudflare** (ClusterIssuer `letsencrypt-cloudflare`; Token-Secret `cloudflare-api-token` out-of-band in `cert-manager`). EIN Wildcard-Cert pro App (`*.<appname>.meinappnest.org`) zentral in `cert-manager`, via **Reflector** (emberstack, `kube-system`) als Secret `wildcard-<appname>-tls` in `tenant-*-<appname>` gespiegelt. Tenant-Ingress referenziert nur das gespiegelte Secret (kein HTTP-01 pro Host).
+- **GitOps:** `platform/infrastructure/cert-manager/` (ClusterIssuer + Wildcard-Cert) ist jetzt Flux-aktiv. cert-manager, Reflector und das Cloudflare-Token-Secret sind Cluster-Prereqs (out-of-band, kein Secret im Git).
+- **Verifiziert:** `https://store.meinappnest.org` und `https://thomas.vaultwarden.meinappnest.org` liefern HTTP 200 mit gueltigem LE-Wildcard-Zertifikat; Tenant-Isolation (Quota/LimitRange/NetworkPolicies) unveraendert intakt.

@@ -1,6 +1,6 @@
 # DynStore
 
-> Self-service Multi-Tenant-Hosting-Plattform (ElfHosted-Stil) auf einem bestehenden **k3s**-HA-Cluster bei Hetzner. Kunden abonnieren im Store eine self-hosted App und erhalten wenige Minuten später eine laufende, isolierte Instanz unter `https://<username>.<appname>.dyndnsv4.de` — inklusive eigener Subdomain und HTTPS.
+> Self-service Multi-Tenant-Hosting-Plattform (ElfHosted-Stil) auf einem bestehenden **k3s**-HA-Cluster bei Hetzner. Kunden abonnieren im Store eine self-hosted App und erhalten wenige Minuten später eine laufende, isolierte Instanz unter `https://<username>.<appname>.meinappnest.org` — inklusive eigener Subdomain und HTTPS.
 
 *Arbeitsname — gern umbenennen.* Status: **Phase 0 (Fundament)**. Siehe [Roadmap](#roadmap).
 
@@ -8,7 +8,7 @@
 
 ## Was DynStore tut
 
-1. Kunde besucht den Store (`store.dyndnsv4.de`), wählt eine App, registriert sich.
+1. Kunde besucht den Store (`store.meinappnest.org`), wählt eine App, registriert sich.
 2. Kunde abonniert (Stripe Checkout).
 3. Auf `checkout.session.completed` provisioniert die **Control-Plane** automatisch eine isolierte Instanz: eigener Namespace → App via Helm/GitOps → PVC → Ingress + TLS → Subdomain.
 4. Im Dashboard „Meine Dienste" sieht der Kunde Status, URL, und kann verwalten/kündigen.
@@ -17,7 +17,7 @@
 ## Architektur (Überblick)
 
 ```
-                 store.dyndnsv4.de                 *.<appname>.dyndnsv4.de
+                 store.meinappnest.org                 *.<appname>.meinappnest.org
                         │                                   │
                         ▼                                   ▼
               ┌───────────────────┐                ┌──────────────────┐
@@ -49,8 +49,8 @@ Provisioning-Prinzip: Die Control-Plane **schreibt** pro Tenant eine `HelmReleas
 | Datenbank | PostgreSQL via Prisma |
 | Bezahlung | Stripe (Checkout + Customer Portal + Webhooks) |
 | Ausrollen | 1 Helm-Chart pro App, ausgeliefert via **Flux** (GitOps) |
-| Ingress / TLS | Traefik + cert-manager, **ein Wildcard-Zertifikat pro App** `*.<appname>.dyndnsv4.de` (DNS-01 über dynDNSv4) |
-| DNS | **dynDNSv4** (DynDNS-Update-API + ACME-DNS-01), Wildcard pro App `*.<appname> → 91.98.1.85` |
+| Ingress / TLS | Traefik + cert-manager, **ein Wildcard-Zertifikat pro App** `*.<appname>.meinappnest.org` (DNS-01 via Cloudflare) |
+| DNS | **Cloudflare** (Registrar + DNS, DNS-01), Wildcard pro App `*.<appname> → 91.98.1.85` |
 | Isolation | Namespace pro Tenant + ResourceQuota + LimitRange + NetworkPolicy |
 | Secrets | SOPS + age (Flux-native), keine Klartext-Secrets im Git |
 
@@ -78,8 +78,8 @@ Begründungen und Trade-offs: **[ADR-0001](docs/adr/0001-foundations.md)**.
 
 ## Domains
 
-- Storefront: `store.dyndnsv4.de`
-- Tenant-Apps: `*.<appname>.dyndnsv4.de` (Schema: `<username>.<appname>.dyndnsv4.de`)
+- Storefront: `store.meinappnest.org`
+- Tenant-Apps: `*.<appname>.meinappnest.org` (Schema: `<username>.<appname>.meinappnest.org`)
 
 ## Eine neue App zum Katalog hinzufügen
 
@@ -93,7 +93,7 @@ Ziel: Eine neue App ist „nur Daten" — kein Sonderfall im Code.
 ## Roadmap
 
 - [x] **Phase 0** — Fundament: Repo-Scaffolding + ADR (GitOps/CNI/Backend/Repo/API/Datenmodell)
-- [ ] **Phase 1** — Infra: Wildcard-DNS + Wildcard-TLS (dynDNSv4 DNS-01), Flux, Tenant-Namespace-Template, Vaultwarden-Chart, 1 Test-Tenant via GitOps
+- [ ] **Phase 1** — Infra: Wildcard-DNS + Wildcard-TLS (Cloudflare DNS-01), Flux, Tenant-Namespace-Template, Vaultwarden-Chart, 1 Test-Tenant via GitOps
 - [ ] **Phase 2** — Control-Plane: Prisma-Migrations, Provisioning-Engine, Basis-API
 - [ ] **Phase 3** — Storefront + Dashboard: Design + higgsfield-Assets + Auth
 - [ ] **Phase 4** — Billing: Stripe Checkout + Webhooks → Provisioning/Lifecycle

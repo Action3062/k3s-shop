@@ -7,7 +7,7 @@ Von **Flux** reconciled. Hier liegt der deklarative Cluster-Zustand.
 | Pfad | Inhalt |
 |---|---|
 | `clusters/prod/` | Flux-Einstieg (GitRepository + Kustomizations) |
-| `infrastructure/` | Wildcard-Cert (`*.<appname>.dyndnsv4.de`), DNS-01-Issuer (dynDNSv4 ACME-DNS-01), gemeinsame Ressourcen |
+| `infrastructure/` | Wildcard-Cert (`*.<appname>.meinappnest.org`), DNS-01-Issuer (Cloudflare ACME-DNS-01), gemeinsame Ressourcen |
 | `catalog/` | 1 Helm-Chart pro App (Muster: `vaultwarden/`) |
 | `tenant-template/` | Namespace + ResourceQuota + LimitRange + NetworkPolicy (Vorlage) |
 | `tenants/` | pro Tenant generierte `HelmRelease`s (von der Control-Plane committet) |
