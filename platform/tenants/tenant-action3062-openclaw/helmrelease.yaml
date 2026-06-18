@@ -25,8 +25,8 @@ spec:
     username: action3062
     appName: openclaw
     baseDomain: meinappnest.org
-    replicas: 1
+    replicas: 0
     storage:
       size: 10Gi
     dataVersion: 1
-    restartToken: "1781799078421"
+    restartToken: ""
