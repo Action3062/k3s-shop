@@ -133,6 +133,7 @@ model ServiceInstance {
   url              String
   status           InstanceStatus    @default(PENDING)
   storageGi        Int               @default(5)
+  dataVersion      Int               @default(1)
   helmReleasePath  String? // platform/tenants/<...>.yaml
   suspendedAt      DateTime?
   deprovisionAfter DateTime? // Karenz-Ende

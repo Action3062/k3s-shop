@@ -46,3 +46,17 @@ export async function startCheckout(customerId: string, planId: string): Promise
   });
   return r.checkoutUrl;
 }
+
+export async function serviceAction(
+  customerId: string,
+  id: string,
+  action: "start" | "stop" | "restart" | "reinstall",
+): Promise<boolean> {
+  if (!BASE) return false;
+  try {
+    await cp(`/v1/services/${id}/${action}`, { method: "POST", customerId });
+    return true;
+  } catch {
+    return false;
+  }
+}

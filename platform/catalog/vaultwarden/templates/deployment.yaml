@@ -7,7 +7,7 @@ metadata:
 spec:
   replicas: {{ .Values.replicas }}
   strategy:
-    type: Recreate          # RWO-Volume -> kein RollingUpdate
+    type: Recreate
   selector:
     matchLabels:
       app: vaultwarden
@@ -15,6 +15,8 @@ spec:
     metadata:
       labels:
         app: vaultwarden
+      annotations:
+        meinappnest.io/restart-token: "{{ .Values.restartToken | default "" }}"
     spec:
       containers:
         - name: vaultwarden
@@ -34,4 +36,4 @@ spec:
       volumes:
         - name: data
           persistentVolumeClaim:
-            claimName: {{ include "vaultwarden.fullname" . }}-data
+            claimName: {{ include "vaultwarden.fullname" . }}-data-v{{ .Values.dataVersion | default 1 }}

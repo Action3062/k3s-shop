@@ -10,13 +10,14 @@ function tenantDir(namespace: string): string {
   return `${config.GITOPS_TENANTS_PATH}/${namespace}`;
 }
 
-function chartValues(inst: { username: string; appSlug: string; storageGi: number }, replicas: number) {
+function chartValues(inst: { username: string; appSlug: string; storageGi: number; dataVersion: number }, replicas: number) {
   return {
     username: inst.username,
     appName: inst.appSlug,
     baseDomain: config.APPS_BASE_DOMAIN,
     replicas,
     storage: { size: `${inst.storageGi}Gi` },
+    dataVersion: inst.dataVersion,
   };
 }
 

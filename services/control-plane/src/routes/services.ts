@@ -4,7 +4,7 @@ import { ApiError, errorBody } from '../lib/errors';
 import { asyncHandler } from '../lib/asyncHandler';
 import { customerContext } from '../middleware/auth';
 import { enqueueJob } from '../services/jobQueue';
-import { scheduleDeprovision } from '../services/lifecycle';
+import { scheduleDeprovision, suspendInstance, resumeInstance, restartInstance, reinstallInstance } from '../services/lifecycle';
 
 export const servicesRouter = Router();
 
@@ -21,82 +21,62 @@ function instanceDto(i: {
   };
 }
 
+/** Load an instance and assert it belongs to the calling customer. */
+async function ownedInstance(req: unknown, id: string) {
+  const customerId = (req as { customerId?: string }).customerId!;
+  const inst = await prisma.serviceInstance.findUnique({ where: { id }, include: { subscription: true } });
+  if (!inst || inst.subscription.customerId !== customerId) {
+    throw new ApiError(404, 'not_found', 'service not found');
+  }
+  return inst;
+}
+
 // ---- customer-facing ----
-servicesRouter.get(
-  '/me/services',
-  customerContext,
-  asyncHandler(async (req, res) => {
-    const customerId = (req as { customerId?: string }).customerId!;
-    const items = await prisma.serviceInstance.findMany({
-      where: { subscription: { customerId } },
-      orderBy: { createdAt: 'desc' },
-    });
-    res.json(items.map(instanceDto));
-  }),
-);
+servicesRouter.get('/me/services', customerContext, asyncHandler(async (req, res) => {
+  const customerId = (req as { customerId?: string }).customerId!;
+  const items = await prisma.serviceInstance.findMany({ where: { subscription: { customerId } }, orderBy: { createdAt: 'desc' } });
+  res.json(items.map(instanceDto));
+}));
 
-servicesRouter.get(
-  '/services/:id',
-  customerContext,
-  asyncHandler(async (req, res) => {
-    const customerId = (req as { customerId?: string }).customerId!;
-    const inst = await prisma.serviceInstance.findUnique({
-      where: { id: req.params.id },
-      include: { subscription: true },
-    });
-    if (!inst || inst.subscription.customerId !== customerId) {
-      return res.status(404).json(errorBody('not_found', 'service not found'));
-    }
-    res.json(instanceDto(inst));
-  }),
-);
+servicesRouter.get('/services/:id', customerContext, asyncHandler(async (req, res) => {
+  const inst = await ownedInstance(req, req.params.id);
+  res.json(instanceDto(inst));
+}));
 
-servicesRouter.delete(
-  '/services/:id',
-  customerContext,
-  asyncHandler(async (req, res) => {
-    const customerId = (req as { customerId?: string }).customerId!;
-    const inst = await prisma.serviceInstance.findUnique({
-      where: { id: req.params.id },
-      include: { subscription: true },
-    });
-    if (!inst || inst.subscription.customerId !== customerId) {
-      return res.status(404).json(errorBody('not_found', 'service not found'));
-    }
-    const after = await scheduleDeprovision(inst.id);
-    res.status(202).json({ scheduled: true, deprovisionAfter: after });
-  }),
-);
+servicesRouter.post('/services/:id/start', customerContext, asyncHandler(async (req, res) => {
+  const inst = await ownedInstance(req, req.params.id);
+  await resumeInstance(inst.id);
+  res.status(202).json({ ok: true, action: 'start' });
+}));
+
+servicesRouter.post('/services/:id/stop', customerContext, asyncHandler(async (req, res) => {
+  const inst = await ownedInstance(req, req.params.id);
+  await suspendInstance(inst.id);
+  res.status(202).json({ ok: true, action: 'stop' });
+}));
+
+servicesRouter.post('/services/:id/restart', customerContext, asyncHandler(async (req, res) => {
+  const inst = await ownedInstance(req, req.params.id);
+  await restartInstance(inst.id);
+  res.status(202).json({ ok: true, action: 'restart' });
+}));
+
+servicesRouter.post('/services/:id/reinstall', customerContext, asyncHandler(async (req, res) => {
+  const inst = await ownedInstance(req, req.params.id);
+  await reinstallInstance(inst.id);
+  res.status(202).json({ ok: true, action: 'reinstall' });
+}));
+
+servicesRouter.delete('/services/:id', customerContext, asyncHandler(async (req, res) => {
+  const inst = await ownedInstance(req, req.params.id);
+  const after = await scheduleDeprovision(inst.id);
+  res.status(202).json({ scheduled: true, deprovisionAfter: after });
+}));
 
 // ---- internal / admin ----
-servicesRouter.post(
-  '/services/:id/suspend',
-  asyncHandler(async (req, res) => {
-    await assertInstance(req.params.id);
-    await enqueueJob(req.params.id, 'SUSPEND', `manual-${Date.now()}`);
-    res.status(202).json({ enqueued: true });
-  }),
-);
-
-servicesRouter.post(
-  '/services/:id/resume',
-  asyncHandler(async (req, res) => {
-    await assertInstance(req.params.id);
-    await enqueueJob(req.params.id, 'RESUME', `manual-${Date.now()}`);
-    res.status(202).json({ enqueued: true });
-  }),
-);
-
-servicesRouter.post(
-  '/services/:id/backup',
-  asyncHandler(async (req, res) => {
-    await assertInstance(req.params.id);
-    await enqueueJob(req.params.id, 'BACKUP', `manual-${Date.now()}`);
-    res.status(202).json({ enqueued: true });
-  }),
-);
-
-async function assertInstance(id: string) {
-  const inst = await prisma.serviceInstance.findUnique({ where: { id } });
-  if (!inst) throw new ApiError(404, 'not_found', 'service not found');
-}
+servicesRouter.post('/services/:id/backup', asyncHandler(async (req, res) => {
+  const inst = await prisma.serviceInstance.findUnique({ where: { id: req.params.id } });
+  if (!inst) return res.status(404).json(errorBody('not_found', 'service not found'));
+  await enqueueJob(req.params.id, 'BACKUP', `manual-${Date.now()}`);
+  res.status(202).json({ enqueued: true });
+}));

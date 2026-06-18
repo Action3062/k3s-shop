@@ -25,3 +25,7 @@ ingress:
   certIssuer: ""                  # z. B. "letsencrypt-prod" -> HTTP-01 pro Host (cert-manager erzeugt <name>-tls)
 
 signupsAllowed: "false"
+
+# Lifecycle (von der Control-Plane gesetzt)
+restartToken: ""        # Änderung erzwingt Pod-Neustart (Restart)
+dataVersion: 1          # Hochzählen = frisches Volume (Neuinstallation, Daten weg)
