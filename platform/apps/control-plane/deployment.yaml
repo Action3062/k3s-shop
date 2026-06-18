@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: control-plane
-          image: ghcr.io/action3062/dynstore-control-plane:20260618095912
+          image: ghcr.io/action3062/dynstore-control-plane:20260618113620
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8080
