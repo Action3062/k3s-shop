@@ -25,7 +25,7 @@ spec:
     username: action3062
     appName: vaultwarden
     baseDomain: meinappnest.org
-    replicas: 0
+    replicas: 1
     storage:
       size: 5Gi
     dataVersion: 1
