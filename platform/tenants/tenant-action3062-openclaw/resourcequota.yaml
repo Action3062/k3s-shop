@@ -5,8 +5,8 @@ metadata:
   namespace: tenant-action3062-openclaw
 spec:
   hard:
-    requests.cpu: "250m"
-    requests.memory: "256Mi"
+    requests.cpu: "1"
+    requests.memory: "2Gi"
     limits.cpu: "1"
     limits.memory: "2048Mi"
     requests.storage: "10Gi"
