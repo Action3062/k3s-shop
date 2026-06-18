@@ -4,6 +4,9 @@ metadata:
   name: {{ include "openclaw.fullname" . }}
   annotations:
     traefik.ingress.kubernetes.io/router.entrypoints: {{ .Values.ingress.entrypoint }}
+    {{- if .Values.gate.enabled }}
+    traefik.ingress.kubernetes.io/router.middlewares: {{ .Release.Namespace }}-{{ include "openclaw.fullname" . }}-gate@kubernetescrd
+    {{- end }}
     {{- if .Values.ingress.certIssuer }}
     cert-manager.io/cluster-issuer: {{ .Values.ingress.certIssuer }}
     {{- end }}

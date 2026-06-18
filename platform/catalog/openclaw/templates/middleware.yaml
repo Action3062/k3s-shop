@@ -1,0 +1,9 @@
+{{- if .Values.gate.enabled }}
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: {{ include "openclaw.fullname" . }}-gate
+spec:
+  forwardAuth:
+    address: {{ .Values.gate.verifyUrl | quote }}
+{{- end }}
