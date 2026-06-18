@@ -13,11 +13,11 @@ export function AppCard({ app, available }: { app: CatalogApp; available?: boole
   return (
     <div className={`relative card rounded-2xl transition hover:-translate-y-0.5 hover:border-line2 ${available ? "" : "opacity-60"}`}>
       <span className={available ? "absolute top-4 right-4 text-[11px] font-medium text-bg rounded-full px-2.5 py-0.5" : "absolute top-4 right-4 text-[11px] text-faint border border-line rounded-full px-2.5 py-0.5"}
-        style={available ? { background: "linear-gradient(180deg,#8a90ff,#6b72f2)" } : undefined}>
+        style={available ? { background: "linear-gradient(135deg,#22d3ee,#0ea5e9)" } : undefined}>
         {available ? "Verfügbar" : "Bald"}
       </span>
       <div className="flex items-center gap-3 mb-3.5">
-        <div className="grid place-items-center w-[46px] h-[46px] rounded-xl font-bold text-[18px] text-bg" style={{ background: MARKS[app.slug] ?? "linear-gradient(135deg,#8a90ff,#6b72f2)" }}>
+        <div className="grid place-items-center w-[46px] h-[46px] rounded-xl font-bold text-[18px] text-bg" style={{ background: MARKS[app.slug] ?? "linear-gradient(135deg,#22d3ee,#0ea5e9)" }}>
           {app.name.charAt(0)}
         </div>
         <div>

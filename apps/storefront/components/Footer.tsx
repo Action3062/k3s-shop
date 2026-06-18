@@ -6,7 +6,7 @@ export function Footer() {
       <div className="wrap">
         <div className="flex flex-wrap justify-between gap-8 mb-7">
           <div className="flex items-center gap-2.5 font-medium text-ink">
-            <span className="grid place-items-center w-7 h-7 rounded-lg text-bg font-bold text-[15px]" style={{ background: "linear-gradient(135deg,#8a90ff,#a855f7)" }}>D</span>
+            <span className="grid place-items-center w-7 h-7 rounded-lg text-bg font-bold text-[15px]" style={{ background: "linear-gradient(135deg,#22d3ee,#0ea5e9)" }}>D</span>
             DynStore
           </div>
           <FCol title="Produkt" links={[["Apps", "/catalog"], ["Preise", "/pricing"], ["So funktioniert's", "/#how"]]} />

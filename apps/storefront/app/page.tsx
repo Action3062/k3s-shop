@@ -9,10 +9,8 @@ export default async function Home() {
   return (
     <>
       <section className="relative overflow-hidden">
-        <img src="/hero-bg.png" alt="" aria-hidden="true" className="pointer-events-none select-none absolute inset-0 w-full h-full object-cover opacity-[0.55]" />
-        <div className="pointer-events-none absolute inset-0" style={{ background: "linear-gradient(90deg,#0a0b0d 0%,rgba(10,11,13,.6) 50%,rgba(10,11,13,.15) 100%)" }} />
         <div className="pointer-events-none absolute inset-x-0 -top-32 h-[620px]"
-          style={{ background: "radial-gradient(620px 320px at 70% 8%,rgba(124,131,255,.22),transparent 60%),radial-gradient(520px 300px at 20% 0%,rgba(168,85,247,.16),transparent 60%)" }} />
+          style={{ background: "radial-gradient(620px 320px at 70% 8%,rgba(34,211,238,.18),transparent 60%),radial-gradient(520px 300px at 20% 0%,rgba(14,165,233,.10),transparent 60%)" }} />
         <div className="wrap relative grid lg:grid-cols-[1.05fr_.95fr] gap-14 items-center py-[84px]">
           <div>
             <span className="pill"><span className="dot" /> Läuft auf deinem k3s-Cluster · Hosted in Germany</span>
@@ -78,7 +76,7 @@ export default async function Home() {
 
       <section className="section">
         <div className="wrap">
-          <div className="rounded-[22px] border border-line2 p-12 text-center" style={{ background: "linear-gradient(135deg,#15151f,#171327)" }}>
+          <div className="rounded-[22px] border border-line2 p-12 text-center" style={{ background: "linear-gradient(135deg,#0C1014,#0E2A31)" }}>
             <h2 className="font-semibold tracking-tight text-[clamp(26px,3.4vw,38px)]">Deine erste App ist in fünf Minuten live.</h2>
             <p className="text-muted my-3 mx-auto max-w-[48ch]">Konto anlegen, App wählen, loslegen — ohne Server-Know-how.</p>
             <Link href="/signup" className="btn btn-primary h-12 px-7">Kostenlos starten →</Link>
@@ -97,7 +95,7 @@ function DemoCard() {
     ["10:03", "Healthcheck grün", true],
   ] as const;
   return (
-    <div className="rounded-[18px] border border-line2 p-[18px]" style={{ background: "linear-gradient(180deg,#15181e,#121519)", boxShadow: "0 30px 80px -40px rgba(0,0,0,.8)" }}>
+    <div className="rounded-[18px] border border-line2 p-[18px]" style={{ background: "linear-gradient(180deg,#11151B,#0C1014)", boxShadow: "0 30px 80px -40px rgba(0,0,0,.8)" }}>
       <div className="flex items-center gap-2 pb-3.5 border-b border-line">
         <i className="w-[11px] h-[11px] rounded-full inline-block bg-[#2a2f37]" /><i className="w-[11px] h-[11px] rounded-full inline-block bg-[#2a2f37]" /><i className="w-[11px] h-[11px] rounded-full inline-block bg-[#2a2f37]" />
         <span className="ml-2 font-mono text-[12.5px] text-faint">dynstore · provisioning</span>

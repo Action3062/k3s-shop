@@ -13,7 +13,7 @@ export default async function Pricing() {
         {catalog.map((a, i) => {
           const plan = a.plans[0];
           return (
-            <div key={a.slug} className={`card rounded-2xl ${i === 0 ? "border-accent" : ""}`} style={i === 0 ? { borderWidth: 1.5, boxShadow: "0 0 0 4px rgba(124,131,255,.08)" } : undefined}>
+            <div key={a.slug} className={`card rounded-2xl ${i === 0 ? "border-accent" : ""}`} style={i === 0 ? { borderWidth: 1.5, boxShadow: "0 0 0 4px rgba(34,211,238,.12)" } : undefined}>
               <h3 className="font-semibold text-lg">{a.name}</h3>
               <div className="text-[34px] font-semibold tracking-tight mt-2.5">{plan ? (plan.priceCents / 100).toFixed(0) : "—"}&nbsp;€</div>
               <span className="text-faint">pro Monat</span>
