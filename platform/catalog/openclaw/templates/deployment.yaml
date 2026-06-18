@@ -1,0 +1,83 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "openclaw.fullname" . }}
+  labels:
+    app: openclaw
+spec:
+  replicas: {{ .Values.replicas }}
+  strategy:
+    type: Recreate           # RWO-Volume -> kein RollingUpdate
+  selector:
+    matchLabels:
+      app: openclaw
+  template:
+    metadata:
+      labels:
+        app: openclaw
+      annotations:
+        meinappnest.io/restart-token: "{{ .Values.restartToken | default "" }}"
+    spec:
+      securityContext:
+        runAsUser: 1000
+        runAsNonRoot: true
+        fsGroup: 1000          # mountet das Volume gruppen-schreibbar für uid 1000
+      initContainers:
+        # Seed der Default-Config ins persistente Volume (nur falls noch nicht vorhanden),
+        # damit OpenClaw seine Config danach selbst verwalten kann.
+        - name: seed-config
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          command: ["sh", "-lc"]
+          args:
+            - |
+              set -e
+              mkdir -p /data
+              [ -f /data/openclaw.json ] || cp /config/openclaw.json /data/openclaw.json
+              [ -f /data/AGENTS.md ] || cp /config/AGENTS.md /data/AGENTS.md
+          volumeMounts:
+            - { name: data, mountPath: /data }
+            - { name: config, mountPath: /config, readOnly: true }
+      containers:
+        - name: openclaw
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.port }}
+          env:
+            - name: HOME
+              value: /home/node
+            - name: OPENCLAW_CONFIG_DIR
+              value: /home/node/.openclaw
+            - name: OPENCLAW_DISABLE_BONJOUR
+              value: "1"
+            - name: OPENCLAW_GATEWAY_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.gatewayTokenSecretName }}
+                  key: {{ .Values.gatewayTokenSecretKey }}
+          volumeMounts:
+            - { name: data, mountPath: /home/node/.openclaw }
+            - { name: tmp, mountPath: /tmp }
+          livenessProbe:
+            httpGet: { path: /healthz, port: {{ .Values.port }} }
+            initialDelaySeconds: 20
+            periodSeconds: 15
+            failureThreshold: 4
+          readinessProbe:
+            httpGet: { path: /readyz, port: {{ .Values.port }} }
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          securityContext:
+            readOnlyRootFilesystem: true
+            allowPrivilegeEscalation: false
+            capabilities: { drop: ["ALL"] }
+          resources: {{ toYaml .Values.resources | nindent 12 }}
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: {{ include "openclaw.fullname" . }}-data-v{{ .Values.dataVersion | default 1 }}
+        - name: config
+          configMap:
+            name: {{ include "openclaw.fullname" . }}-config
+        - name: tmp
+          emptyDir: {}

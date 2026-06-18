@@ -1,0 +1,36 @@
+# Pro-Tenant-Werte injiziert die Control-Plane über die HelmRelease.
+username: ""              # DNS-Label des Kunden
+appName: openclaw        # App-Label in der Domain
+baseDomain: meinappnest.org
+
+replicas: 1              # 0 = suspendiert
+
+image:
+  repository: ghcr.io/openclaw/openclaw
+  tag: "2026.2.26"       # offizielles GHCR-Image (Tags: main|latest|<version>)
+  pullPolicy: IfNotPresent
+
+# OpenClaw lauscht auf 18789 (Gateway + Control-UI)
+port: 18789
+
+storage:
+  size: 10Gi             # Hetzner-Volumes Minimum = 10Gi
+  storageClassName: hcloud-volumes
+
+resources:
+  requests: { cpu: 250m, memory: 512Mi }
+  limits:   { cpu: "1",  memory: 2Gi }
+
+ingress:
+  className: traefik
+  entrypoint: websecure
+  useDefaultWildcardCert: false   # nutzt das gespiegelte Wildcard-Secret pro App
+  certIssuer: ""                  # leer => kein HTTP-01 pro Host
+
+# Gateway-Token: Secret wird von der Control-Plane out-of-band verwaltet (NICHT in Git).
+gatewayTokenSecretName: openclaw-secrets
+gatewayTokenSecretKey: OPENCLAW_GATEWAY_TOKEN
+
+# Lifecycle (Control-Plane)
+restartToken: ""         # Änderung erzwingt Pod-Neustart
+dataVersion: 1           # Hochzählen = frisches Volume (Neuinstallation)
