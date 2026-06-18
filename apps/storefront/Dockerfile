@@ -21,3 +21,5 @@ COPY --from=build /app/next.config.mjs ./next.config.mjs
 COPY --from=build /app/prisma ./prisma
 EXPOSE 3000
 CMD ["npm","run","start","--","-H","0.0.0.0","-p","3000"]
+
+# ci-retrigger 2026-06-18T08:53:12Z
