@@ -3,6 +3,8 @@ import { config } from '../config';
 import { renderHelmRelease } from './helmrelease';
 import { writeFilesAndCommit } from './gitops';
 import { createVolumeSnapshot } from './kube';
+import { generateGatewayToken, renderGatewaySecret } from './tokens';
+import { encryptSecretYaml } from './sops';
 import { logger } from '../logger';
 
 function tenantDir(namespace: string): string {
@@ -82,4 +84,25 @@ export async function backupInstance(instanceId: string): Promise<void> {
     await prisma.backup.update({ where: { id: backup.id }, data: { status: 'FAILED', location: String((e as Error).message) } });
     throw e;
   }
+}
+
+export async function regenerateGatewayToken(instanceId: string): Promise<void> {
+  const inst = await prisma.serviceInstance.findUniqueOrThrow({ where: { id: instanceId } });
+  const token = generateGatewayToken();
+  await prisma.serviceInstance.update({ where: { id: instanceId }, data: { gatewayToken: token } });
+  const dir = tenantDir(inst.namespace);
+  const secret = await encryptSecretYaml(renderGatewaySecret(inst.namespace, token));
+  const hr = renderHelmRelease({
+    name: `${inst.username}-${inst.appSlug}`,
+    namespace: inst.namespace,
+    appChart: inst.appSlug,
+    values: {
+      username: inst.username, appName: inst.appSlug, baseDomain: config.APPS_BASE_DOMAIN,
+      replicas: 1, storage: { size: `${inst.storageGi}Gi` }, dataVersion: inst.dataVersion,
+      restartToken: String(Date.now()),
+    },
+  });
+  await writeFilesAndCommit({ [`${dir}/secret.sops.yaml`]: secret, [`${dir}/helmrelease.yaml`]: hr }, `regenerate-token: ${inst.namespace}`);
+  await prisma.serviceInstance.update({ where: { id: instanceId }, data: { status: 'RUNNING' } });
+  logger.info({ instanceId }, 'gateway token regenerated');
 }

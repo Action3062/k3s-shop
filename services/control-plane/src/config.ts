@@ -36,6 +36,7 @@ const schema = z.object({
   DYNDNS_TOKEN: z.string().optional(),    // Hostname-/Account-Token (NIE committen)
 
   KUBECONFIG: z.string().optional(),
+  SOPS_AGE_RECIPIENT: z.string().optional(),
 });
 
 export const config = schema.parse(process.env);

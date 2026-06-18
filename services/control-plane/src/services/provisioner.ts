@@ -4,6 +4,8 @@ import { renderTenantTemplate } from './templates';
 import { renderHelmRelease } from './helmrelease';
 import { writeFilesAndCommit, removePathAndCommit } from './gitops';
 import { ensureTenantRecord } from './dns';
+import { generateGatewayToken, renderGatewaySecret } from './tokens';
+import { encryptSecretYaml } from './sops';
 import { logger } from '../logger';
 
 function tenantDir(namespace: string): string {
@@ -55,6 +57,13 @@ export async function provisionInstance(instanceId: string): Promise<void> {
   const files: Record<string, string> = {};
   for (const [name, content] of Object.entries(template)) files[`${dir}/${name}`] = content;
   files[`${dir}/helmrelease.yaml`] = helmRelease;
+
+  // OpenClaw: Gateway-Token erzeugen, in DB speichern, als SOPS-Secret mitcommitten (nie im Klartext in Git)
+  if (inst.appSlug === 'openclaw') {
+    const token = generateGatewayToken();
+    await prisma.serviceInstance.update({ where: { id: instanceId }, data: { gatewayToken: token } });
+    files[`${dir}/secret.sops.yaml`] = await encryptSecretYaml(renderGatewaySecret(inst.namespace, token));
+  }
 
   // 3) Commit -> Flux reconciled
   await writeFilesAndCommit(files, `provision: ${inst.namespace}`);

@@ -4,7 +4,7 @@ import { ApiError, errorBody } from '../lib/errors';
 import { asyncHandler } from '../lib/asyncHandler';
 import { customerContext } from '../middleware/auth';
 import { enqueueJob } from '../services/jobQueue';
-import { scheduleDeprovision, suspendInstance, resumeInstance, restartInstance, reinstallInstance } from '../services/lifecycle';
+import { scheduleDeprovision, suspendInstance, resumeInstance, restartInstance, reinstallInstance, regenerateGatewayToken } from '../services/lifecycle';
 
 export const servicesRouter = Router();
 
@@ -65,6 +65,17 @@ servicesRouter.post('/services/:id/reinstall', customerContext, asyncHandler(asy
   const inst = await ownedInstance(req, req.params.id);
   await reinstallInstance(inst.id);
   res.status(202).json({ ok: true, action: 'reinstall' });
+}));
+
+servicesRouter.get('/services/:id/token', customerContext, asyncHandler(async (req, res) => {
+  const inst = await ownedInstance(req, req.params.id);
+  res.json({ token: inst.gatewayToken ?? null });
+}));
+
+servicesRouter.post('/services/:id/regenerate-token', customerContext, asyncHandler(async (req, res) => {
+  const inst = await ownedInstance(req, req.params.id);
+  await regenerateGatewayToken(inst.id);
+  res.status(202).json({ ok: true, action: 'regenerate-token' });
 }));
 
 servicesRouter.delete('/services/:id', customerContext, asyncHandler(async (req, res) => {
