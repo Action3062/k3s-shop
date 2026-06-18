@@ -1,0 +1,6 @@
+# SOPS-Regeln: verschlüsselt nur data/stringData in *.sops.yaml unter platform/.
+# Ersetze den age-Recipient durch deinen echten age-Public-Key (age1...).
+creation_rules:
+  - path_regex: platform/.*\.sops\.ya?ml$
+    encrypted_regex: ^(data|stringData)$
+    age: age1v692qut43hq0k07jz6afe75txgtjjpffe0nsyw9qx55p8s5qj50scylpqu

@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: tenant-quota
+  namespace: __NAMESPACE__
+spec:
+  hard:
+    requests.cpu: "__CPU_REQUEST__"
+    requests.memory: "__MEM_REQUEST__"
+    limits.cpu: "__CPU_LIMIT__"
+    limits.memory: "__MEM_LIMIT__"
+    requests.storage: "__STORAGE__"
+    persistentvolumeclaims: "2"
+    count/deployments.apps: "3"
+    pods: "10"

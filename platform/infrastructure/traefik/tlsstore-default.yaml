@@ -1,0 +1,3 @@
+# ÜBERHOLT — bei <username>.<app>.dyndnsv4.de nutzen wir EIN Wildcard-Zertifikat PRO APP
+# (cert-manager + Reflector). Ein globales Traefik-Default-Cert deckt mehrere App-Wildcards
+# nicht ab. Tenant-Ingresses referenzieren stattdessen 'wildcard-<app>-tls'.

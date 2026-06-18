@@ -1,0 +1,177 @@
+// DynStore — Tenant-Datenmodell (Entwurf, Phase 0)
+// Quelle der Wahrheit für die Control-Plane. Migrations folgen in Phase 2.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  USER
+  ADMIN
+}
+
+enum SubscriptionStatus {
+  INCOMPLETE
+  ACTIVE
+  PAST_DUE
+  SUSPENDED
+  CANCELED
+}
+
+enum InstanceStatus {
+  PENDING
+  PROVISIONING
+  RUNNING
+  SUSPENDED
+  DEPROVISIONING
+  DEPROVISIONED
+  FAILED
+}
+
+enum JobType {
+  PROVISION
+  SUSPEND
+  RESUME
+  DEPROVISION
+  BACKUP
+}
+
+enum JobStatus {
+  QUEUED
+  RUNNING
+  SUCCEEDED
+  FAILED
+}
+
+enum BackupStatus {
+  PENDING
+  COMPLETED
+  FAILED
+}
+
+model User {
+  id           String    @id @default(cuid())
+  email        String    @unique
+  username     String    @unique   // DNS-Label, bei Registrierung festgelegt
+  name         String?
+  passwordHash String?
+  role         UserRole  @default(USER)
+  customer     Customer?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+}
+
+model Customer {
+  id               String         @id @default(cuid())
+  user             User           @relation(fields: [userId], references: [id])
+  userId           String         @unique
+  stripeCustomerId String?        @unique
+  subscriptions    Subscription[]
+  createdAt        DateTime       @default(now())
+}
+
+model CatalogApp {
+  id               String         @id @default(cuid())
+  slug             String         @unique
+  name             String
+  description      String
+  logoUrl          String?
+  category         String?
+  defaultStorageGi Int            @default(5)
+  active           Boolean        @default(true)
+  plans            Plan[]
+  subscriptions    Subscription[]
+  createdAt        DateTime       @default(now())
+}
+
+model Plan {
+  id            String         @id @default(cuid())
+  app           CatalogApp     @relation(fields: [appId], references: [id])
+  appId         String
+  name          String
+  stripePriceId String         @unique
+  priceCents    Int
+  interval      String         @default("month")
+  cpuLimit      String? // z. B. "500m"
+  memLimitMi    Int? // z. B. 512
+  storageGi     Int            @default(5)
+  subscriptions Subscription[]
+  createdAt     DateTime       @default(now())
+}
+
+model Subscription {
+  id                   String             @id @default(cuid())
+  customer             Customer           @relation(fields: [customerId], references: [id])
+  customerId           String
+  app                  CatalogApp         @relation(fields: [appId], references: [id])
+  appId                String
+  plan                 Plan               @relation(fields: [planId], references: [id])
+  planId               String
+  stripeSubscriptionId String?            @unique
+  status               SubscriptionStatus @default(INCOMPLETE)
+  currentPeriodEnd     DateTime?
+  instance             ServiceInstance?
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime           @updatedAt
+}
+
+model ServiceInstance {
+  id               String            @id @default(cuid())
+  subscription     Subscription      @relation(fields: [subscriptionId], references: [id])
+  subscriptionId   String            @unique
+  appSlug          String
+  username         String
+  name             String
+  namespace        String            @unique
+  subdomain        String            @unique
+  url              String
+  status           InstanceStatus    @default(PENDING)
+  storageGi        Int               @default(5)
+  helmReleasePath  String? // platform/tenants/<...>.yaml
+  suspendedAt      DateTime?
+  deprovisionAfter DateTime? // Karenz-Ende
+  lastBackupAt     DateTime?
+  jobs             ProvisioningJob[]
+  backups          Backup[]
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+}
+
+model ProvisioningJob {
+  id             String          @id @default(cuid())
+  instance       ServiceInstance @relation(fields: [instanceId], references: [id])
+  instanceId     String
+  type           JobType
+  status         JobStatus       @default(QUEUED)
+  idempotencyKey String          @unique
+  attempts       Int             @default(0)
+  lastError      String?
+  payload        Json?
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+}
+
+model WebhookEvent {
+  id            String    @id @default(cuid())
+  stripeEventId String    @unique
+  type          String
+  payload       Json
+  processedAt   DateTime?
+  receivedAt    DateTime  @default(now())
+}
+
+model Backup {
+  id          String          @id @default(cuid())
+  instance    ServiceInstance @relation(fields: [instanceId], references: [id])
+  instanceId  String
+  status      BackupStatus    @default(PENDING)
+  snapshotRef String? // hcloud CSI VolumeSnapshot
+  location    String?
+  sizeBytes   BigInt?
+  createdAt   DateTime        @default(now())
+}

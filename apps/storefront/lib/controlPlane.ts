@@ -1,0 +1,48 @@
+import type { CatalogApp, ServiceInstance } from "./types";
+
+const BASE = process.env.CONTROL_PLANE_URL ?? "";
+const TOKEN = process.env.CP_SERVICE_TOKEN ?? "";
+
+async function cp<T>(path: string, init?: RequestInit & { customerId?: string }): Promise<T> {
+  const headers: Record<string, string> = {
+    "content-type": "application/json",
+    authorization: `Bearer ${TOKEN}`,
+    ...(init?.customerId ? { "x-customer-id": init.customerId } : {}),
+  };
+  const res = await fetch(`${BASE}${path}`, { ...init, headers, cache: "no-store" });
+  if (!res.ok) throw new Error(`control-plane ${path} -> ${res.status}`);
+  return res.json() as Promise<T>;
+}
+
+// Statischer Fallback, solange die Control-Plane nicht läuft (Design-/Build-Phase).
+export const FALLBACK_CATALOG: CatalogApp[] = [
+  { slug: "vaultwarden", name: "Vaultwarden", category: "Passwort-Manager",
+    description: "Self-hosted, Bitwarden-kompatibler Tresor für Passwörter & Secrets — privat und sicher.",
+    plans: [{ id: "vw-standard", name: "Standard", priceCents: 500, interval: "month", storageGi: 5 }] },
+  { slug: "nextcloud", name: "Nextcloud", category: "Dateien & Kollaboration",
+    description: "Deine eigene Cloud für Dateien, Kalender und Kontakte.",
+    plans: [{ id: "nc-standard", name: "Standard", priceCents: 900, interval: "month", storageGi: 50 }] },
+  { slug: "jellyfin", name: "Jellyfin", category: "Medien-Streaming",
+    description: "Streame deine Film- und Musiksammlung von überall.",
+    plans: [{ id: "jf-standard", name: "Standard", priceCents: 700, interval: "month", storageGi: 10 }] },
+];
+
+export async function getCatalog(): Promise<CatalogApp[]> {
+  if (!BASE) return FALLBACK_CATALOG;
+  try { return await cp<CatalogApp[]>("/v1/catalog"); }
+  catch { return FALLBACK_CATALOG; }
+}
+
+export async function getServices(customerId: string): Promise<ServiceInstance[]> {
+  if (!BASE) return [];
+  try { return await cp<ServiceInstance[]>("/v1/me/services", { customerId }); }
+  catch { return []; }
+}
+
+export async function startCheckout(customerId: string, planId: string): Promise<string | null> {
+  if (!BASE) return null;
+  const r = await cp<{ checkoutUrl: string }>("/v1/checkout/session", {
+    method: "POST", customerId, body: JSON.stringify({ planId }),
+  });
+  return r.checkoutUrl;
+}

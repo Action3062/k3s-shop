@@ -1,0 +1,26 @@
+# DNS-01 via RFC2136/TSIG gegen die eigene PowerDNS (dynDNSv4-Backend, volle Kontrolle).
+# Voraussetzung: PowerDNS mit dnsupdate=yes + allow-dnsupdate-from/TSIG für die Zone.
+# Platzhalter __ACME_EMAIL__ und __POWERDNS_IP__ vor dem Anwenden setzen.
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-dyndnsv4
+spec:
+  acme:
+    server: https://acme-v02.api.letsencrypt.org/directory
+    email: __ACME_EMAIL__
+    privateKeySecretRef:
+      name: letsencrypt-dyndnsv4-account-key
+    solvers:
+      - dns01:
+          rfc2136:
+            nameserver: "__POWERDNS_IP__:53"
+            tsigKeyName: dynstore-acme
+            tsigAlgorithm: HMACSHA256
+            tsigSecretSecretRef:
+              name: powerdns-tsig
+              key: tsig-secret
+        selector:
+          dnsNames:
+            - "*.vaultwarden.dyndnsv4.de"
+            # weitere App-Wildcards hier ergänzen

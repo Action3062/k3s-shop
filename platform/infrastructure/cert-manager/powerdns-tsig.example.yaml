@@ -1,0 +1,10 @@
+# PLATZHALTER — TSIG-Secret für cert-manager RFC2136 (DNS-01 gegen PowerDNS).
+# NICHT mit echten Werten committen. SOPS: -> powerdns-tsig.sops.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: powerdns-tsig
+  namespace: cert-manager
+type: Opaque
+stringData:
+  tsig-secret: "__BASE64_TSIG_KEY__"

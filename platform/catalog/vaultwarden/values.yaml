@@ -1,0 +1,27 @@
+# Pro-Tenant-Werte injiziert die Control-Plane über die HelmRelease.
+username: ""             # DNS-Label des Kunden (bei Registrierung gewählt)
+appName: vaultwarden     # App-Label in der Domain
+baseDomain: dyndnsv4.de  # Host = <username>.<appName>.<baseDomain>
+
+replicas: 1              # 0 = suspendiert
+
+image:
+  repository: vaultwarden/server
+  tag: "1.32.0"
+  pullPolicy: IfNotPresent
+
+storage:
+  size: 5Gi
+  storageClassName: hcloud-volumes
+
+resources:
+  requests: { cpu: 100m, memory: 128Mi }
+  limits:   { cpu: 500m, memory: 512Mi }
+
+ingress:
+  className: traefik
+  entrypoint: websecure
+  useDefaultWildcardCert: false   # true = Traefik-Default; false = Secret pro Host/App
+  certIssuer: ""                  # z. B. "letsencrypt-prod" -> HTTP-01 pro Host (cert-manager erzeugt <name>-tls)
+
+signupsAllowed: "false"

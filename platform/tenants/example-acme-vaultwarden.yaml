@@ -1,0 +1,3 @@
+# ÜBERHOLT & ABSICHTLICH LEER (keine Ressource).
+# Beispiel verschoben nach docs/example-tenant-helmrelease.yaml, da Flux alles unter
+# platform/tenants/ ausrollt. Diese Datei enthält bewusst keine Kubernetes-Objekte.

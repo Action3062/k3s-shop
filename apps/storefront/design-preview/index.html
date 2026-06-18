@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>DynStore — Design-Vorschau</title>
+<style>
+  :root{
+    --bg:#0a0b0d; --bg2:#0d0f13; --surface:#15181e; --surface2:#1a1e25;
+    --border:rgba(255,255,255,.08); --border2:rgba(255,255,255,.14);
+    --text:#f4f6f8; --muted:#9aa4af; --faint:#6b7480;
+    --accent:#7c83ff; --accent2:#a855f7; --accent-ink:#cdd0ff;
+    --ok:#34d399; --radius:14px; --maxw:1120px;
+    --font:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--text);font-family:var(--font);line-height:1.6;-webkit-font-smoothing:antialiased}
+  a{color:inherit;text-decoration:none}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px}
+  .btn{display:inline-flex;align-items:center;gap:8px;height:44px;padding:0 20px;border-radius:10px;font-weight:500;font-size:15px;border:1px solid var(--border2);transition:.15s}
+  .btn.primary{background:linear-gradient(180deg,#8a90ff,#6b72f2);border-color:transparent;color:#0a0b0d}
+  .btn.primary:hover{filter:brightness(1.08)}
+  .btn.ghost:hover{background:var(--surface);border-color:var(--border2)}
+  .pill{display:inline-flex;align-items:center;gap:8px;height:30px;padding:0 12px;border:1px solid var(--border);border-radius:999px;font-size:13px;color:var(--muted);background:var(--bg2)}
+  .dot{width:7px;height:7px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 4px rgba(52,211,153,.15)}
+  .eyebrow{color:var(--accent-ink);font-weight:500;font-size:13px;letter-spacing:.04em;text-transform:uppercase}
+  h1{font-size:clamp(34px,5.2vw,60px);line-height:1.05;letter-spacing:-.02em;font-weight:600}
+  h2{font-size:clamp(26px,3.4vw,38px);line-height:1.12;letter-spacing:-.02em;font-weight:600}
+  h3{font-size:18px;font-weight:600;letter-spacing:-.01em}
+  .muted{color:var(--muted)}
+  .faint{color:var(--faint)}
+  section{padding:84px 0;border-top:1px solid var(--border)}
+
+  /* nav */
+  header{position:sticky;top:0;z-index:50;background:rgba(10,11,13,.72);backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}
+  .nav{display:flex;align-items:center;justify-content:space-between;height:64px}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:600;letter-spacing:-.01em}
+  .logo{width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,#8a90ff,#a855f7);display:grid;place-items:center;color:#0a0b0d;font-weight:700;font-size:15px}
+  .nav nav{display:flex;gap:26px}.nav nav a{color:var(--muted);font-size:15px}.nav nav a:hover{color:var(--text)}
+  .nav-cta{display:flex;align-items:center;gap:14px}
+
+  /* hero */
+  .hero{position:relative;overflow:hidden;border-top:none}
+  .glow{position:absolute;inset:-20% 0 auto 0;height:620px;background:
+     radial-gradient(620px 320px at 70% 8%,rgba(124,131,255,.22),transparent 60%),
+     radial-gradient(520px 300px at 20% 0%,rgba(168,85,247,.16),transparent 60%);
+     pointer-events:none}
+  .hero .wrap{position:relative;padding-top:84px;padding-bottom:84px;display:grid;grid-template-columns:1.05fr .95fr;gap:54px;align-items:center}
+  .hero p.lede{font-size:19px;color:var(--muted);margin:22px 0 30px;max-width:33ch}
+  .hero .cta{display:flex;gap:14px;flex-wrap:wrap}
+  .heronote{margin-top:20px;font-size:13px;color:var(--faint)}
+  /* provisioning demo card */
+  .demo{background:linear-gradient(180deg,var(--surface),#121519);border:1px solid var(--border2);border-radius:18px;padding:18px;box-shadow:0 30px 80px -40px rgba(0,0,0,.8)}
+  .demo .bar{display:flex;align-items:center;gap:8px;padding-bottom:14px;border-bottom:1px solid var(--border)}
+  .demo .bar i{width:11px;height:11px;border-radius:50%;background:#2a2f37;display:inline-block}
+  .demo .bar .u{margin-left:8px;font-family:var(--mono);font-size:12.5px;color:var(--faint)}
+  .line{font-family:var(--mono);font-size:13px;padding:7px 0;color:var(--muted);display:flex;gap:10px;align-items:center}
+  .line .t{color:var(--faint);min-width:54px}
+  .line b{color:var(--text);font-weight:500}
+  .line .ok{color:var(--ok)}
+  .urlcard{margin-top:14px;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between}
+  .urlcard .u{font-family:var(--mono);font-size:13.5px;color:var(--accent-ink)}
+
+  /* trust strip */
+  .strip{display:flex;gap:30px;flex-wrap:wrap;align-items:center;color:var(--faint);font-size:14px}
+  .strip span{display:inline-flex;gap:9px;align-items:center}
+
+  /* features */
+  .grid{display:grid;gap:18px}
+  .f4{grid-template-columns:repeat(4,1fr)}
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:22px}
+  .card .ic{width:40px;height:40px;border-radius:10px;background:var(--surface2);border:1px solid var(--border);display:grid;place-items:center;margin-bottom:14px;color:var(--accent-ink);font-size:20px}
+  .card h3{margin-bottom:6px}.card p{font-size:14.5px;color:var(--muted)}
+
+  /* catalog */
+  .sec-head{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;margin-bottom:34px;flex-wrap:wrap}
+  .apps{grid-template-columns:repeat(3,1fr)}
+  .app{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:22px;transition:.15s;position:relative}
+  .app:hover{border-color:var(--border2);transform:translateY(-2px)}
+  .app .top{display:flex;align-items:center;gap:13px;margin-bottom:14px}
+  .app .mark{width:46px;height:46px;border-radius:12px;display:grid;place-items:center;font-weight:700;font-size:18px;color:#0a0b0d}
+  .app .meta b{display:block;font-size:16px}.app .meta span{font-size:12.5px;color:var(--faint)}
+  .app p{font-size:14px;color:var(--muted);min-height:42px}
+  .app .foot{display:flex;align-items:center;justify-content:space-between;margin-top:16px;padding-top:16px;border-top:1px solid var(--border)}
+  .price b{font-size:20px}.price span{color:var(--faint);font-size:13px}
+  .soon{position:absolute;top:16px;right:16px;font-size:11px;color:var(--faint);border:1px solid var(--border);border-radius:999px;padding:3px 9px}
+  .app.muted2{opacity:.62}
+  .badge-feat{position:absolute;top:16px;right:16px;font-size:11px;color:#0a0b0d;background:linear-gradient(180deg,#8a90ff,#6b72f2);border-radius:999px;padding:3px 10px;font-weight:600}
+
+  /* steps */
+  .steps{grid-template-columns:repeat(3,1fr)}
+  .step .n{font-family:var(--mono);color:var(--accent-ink);font-size:13px;margin-bottom:10px}
+
+  /* pricing */
+  .ptiers{grid-template-columns:repeat(3,1fr)}
+  .tier{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:26px}
+  .tier.hot{border:1.5px solid var(--accent);box-shadow:0 0 0 4px rgba(124,131,255,.08)}
+  .tier .amt{font-size:34px;font-weight:600;letter-spacing:-.02em;margin:10px 0 2px}
+  .tier ul{list-style:none;margin:18px 0 0}.tier li{font-size:14px;color:var(--muted);padding:7px 0;display:flex;gap:10px}.tier li::before{content:"✓";color:var(--ok)}
+
+  /* CTA band + footer */
+  .band{background:linear-gradient(135deg,#15151f,#171327);border:1px solid var(--border2);border-radius:22px;padding:48px;text-align:center}
+  footer{border-top:1px solid var(--border);padding:46px 0;color:var(--faint);font-size:14px}
+  .fcols{display:flex;justify-content:space-between;gap:30px;flex-wrap:wrap;margin-bottom:26px}
+  .fcols a{display:block;color:var(--muted);padding:5px 0}.fcols a:hover{color:var(--text)}
+  .fcol b{font-size:13px;color:var(--text);display:block;margin-bottom:8px}
+
+  @media(max-width:900px){.hero .wrap{grid-template-columns:1fr}.f4,.apps,.steps,.ptiers{grid-template-columns:1fr 1fr}.nav nav{display:none}}
+  @media(max-width:620px){.f4,.apps,.steps,.ptiers{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap nav">
+    <div class="brand"><span class="logo">D</span> DynStore</div>
+    <nav><a href="#apps">Apps</a><a href="#how">So funktioniert's</a><a href="#pricing">Preise</a><a href="#">Docs</a></nav>
+    <div class="nav-cta"><a class="muted" href="#" style="font-size:15px">Login</a><a class="btn primary" href="#">Kostenlos starten</a></div>
+  </div>
+</header>
+
+<section class="hero">
+  <img src="../public/hero-bg.png" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.5;pointer-events:none">
+  <div style="position:absolute;inset:0;background:linear-gradient(90deg,#0a0b0d 0%,rgba(10,11,13,.6) 50%,rgba(10,11,13,.15) 100%);pointer-events:none"></div>
+  <div class="glow"></div>
+  <div class="wrap">
+    <div>
+      <span class="pill"><span class="dot"></span> Läuft auf deinem k3s-Cluster · Hosted in Germany</span>
+      <h1 style="margin-top:18px">Self-hosted Apps.<br>Live in Minuten.<br>Auf deiner Subdomain.</h1>
+      <p class="lede">Wähle eine App, abonniere sie — und erhalte automatisch eine isolierte, verschlüsselte Instanz unter deiner eigenen Adresse. Kein Setup, kein Server-Gefrickel.</p>
+      <div class="cta">
+        <a class="btn primary" href="#apps">Apps ansehen →</a>
+        <a class="btn ghost" href="#how">So funktioniert's</a>
+      </div>
+      <div class="heronote">Eigene Subdomain · automatisches HTTPS · jederzeit kündbar · tägliche Backups</div>
+    </div>
+    <div class="demo" aria-hidden="true">
+      <div class="bar"><i></i><i></i><i></i><span class="u">dynstore · provisioning</span></div>
+      <div class="line"><span class="t">10:02</span> <span>Bestellung erhalten — <b>Vaultwarden</b></span></div>
+      <div class="line"><span class="t">10:02</span> <span>Namespace <b>tenant-thomas-vaultwarden</b> <span class="ok">erstellt</span></span></div>
+      <div class="line"><span class="t">10:03</span> <span>Volume · Ingress · TLS <span class="ok">bereit</span></span></div>
+      <div class="line"><span class="t">10:03</span> <span>Healthcheck <span class="ok">grün</span></span></div>
+      <div class="urlcard">
+        <span class="u">https://thomas.vaultwarden.dyndnsv4.de</span>
+        <span class="pill" style="height:26px"><span class="dot"></span> live</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section style="padding:34px 0">
+  <div class="wrap strip">
+    <span>Mandantengetrennt (1 Namespace pro Kunde)</span>
+    <span>· Wildcard-TLS via Let's Encrypt</span>
+    <span>· GitOps-Auslieferung</span>
+    <span>· DSGVO, Server in Deutschland</span>
+  </div>
+</section>
+
+<section id="features">
+  <div class="wrap">
+    <span class="eyebrow">Warum DynStore</span>
+    <h2 style="margin:10px 0 8px">Hosting, das sich um sich selbst kümmert.</h2>
+    <p class="muted" style="max-width:60ch;margin-bottom:34px">Du klickst „Abonnieren". Wir kümmern uns um Ausrollen, TLS, Isolation und Lebenszyklus.</p>
+    <div class="grid f4">
+      <div class="card"><div class="ic">⚡</div><h3>In Minuten live</h3><p>Nach dem Kauf wird deine Instanz automatisch ausgerollt — kein manuelles Setup.</p></div>
+      <div class="card"><div class="ic">🔒</div><h3>Eigene Domain + HTTPS</h3><p>Jede Instanz unter <span style="font-family:var(--mono);font-size:13px">name.app.dyndnsv4.de</span> mit gültigem Zertifikat.</p></div>
+      <div class="card"><div class="ic">🧩</div><h3>Sauber getrennt</h3><p>Eigener Namespace, Ressourcen-Limits und Netzwerk-Isolation pro Kunde.</p></div>
+      <div class="card"><div class="ic">↺</div><h3>Volle Kontrolle</h3><p>Verwalten, pausieren oder kündigen — mit Backup vor jeder Löschung.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="apps">
+  <div class="wrap">
+    <div class="sec-head">
+      <div><span class="eyebrow">Katalog</span><h2 style="margin-top:10px">Wähle deine App</h2></div>
+      <span class="muted" style="font-size:14px">Mehr Apps in Kürze — Wünsche willkommen.</span>
+    </div>
+    <div class="grid apps">
+      <div class="app">
+        <span class="badge-feat">Verfügbar</span>
+        <div class="top"><div class="mark" style="background:linear-gradient(135deg,#3b82f6,#1d4ed8)">V</div><div class="meta"><b>Vaultwarden</b><span>Passwort-Manager</span></div></div>
+        <p>Self-hosted Bitwarden-kompatibler Tresor für Passwörter & Secrets — privat und sicher.</p>
+        <div class="foot"><span class="price"><b>5&nbsp;€</b><span>/ Monat</span></span><a class="btn primary" href="#" style="height:38px">Abonnieren</a></div>
+      </div>
+      <div class="app muted2">
+        <span class="soon">Bald</span>
+        <div class="top"><div class="mark" style="background:linear-gradient(135deg,#0ea5e9,#0369a1)">N</div><div class="meta"><b>Nextcloud</b><span>Dateien & Kollaboration</span></div></div>
+        <p>Deine eigene Cloud für Dateien, Kalender und Kontakte.</p>
+        <div class="foot"><span class="price"><b>9&nbsp;€</b><span>/ Monat</span></span><a class="btn ghost" href="#" style="height:38px">Benachrichtigen</a></div>
+      </div>
+      <div class="app muted2">
+        <span class="soon">Bald</span>
+        <div class="top"><div class="mark" style="background:linear-gradient(135deg,#a855f7,#6d28d9)">J</div><div class="meta"><b>Jellyfin</b><span>Medien-Streaming</span></div></div>
+        <p>Streame deine Film- und Musiksammlung von überall.</p>
+        <div class="foot"><span class="price"><b>7&nbsp;€</b><span>/ Monat</span></span><a class="btn ghost" href="#" style="height:38px">Benachrichtigen</a></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="how">
+  <div class="wrap">
+    <span class="eyebrow">So funktioniert's</span>
+    <h2 style="margin:10px 0 34px">Drei Schritte zur eigenen Instanz.</h2>
+    <div class="grid steps">
+      <div class="card step"><div class="n">01</div><h3>App wählen & abonnieren</h3><p class="muted" style="font-size:14.5px">Konto anlegen, App aus dem Katalog wählen, sicher per Stripe bezahlen.</p></div>
+      <div class="card step"><div class="n">02</div><h3>Automatisches Ausrollen</h3><p class="muted" style="font-size:14.5px">Wir legen Namespace, Speicher, Ingress und TLS an — vollautomatisch.</p></div>
+      <div class="card step"><div class="n">03</div><h3>Loslegen</h3><p class="muted" style="font-size:14.5px">Deine Instanz ist unter deiner Subdomain erreichbar. Fertig.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="pricing">
+  <div class="wrap">
+    <span class="eyebrow">Preise</span>
+    <h2 style="margin:10px 0 8px">Pro App. Monatlich kündbar.</h2>
+    <p class="muted" style="margin-bottom:34px">Du zahlst nur für die Apps, die du nutzt. Keine versteckten Kosten.</p>
+    <div class="grid ptiers">
+      <div class="tier"><h3>Vaultwarden</h3><div class="amt">5&nbsp;€</div><span class="faint">pro Monat</span><ul><li>5 GB Speicher</li><li>Eigene Subdomain + HTTPS</li><li>Tägliche Backups</li></ul></div>
+      <div class="tier hot"><h3>Nextcloud <span class="faint" style="font-size:12px">· bald</span></h3><div class="amt">9&nbsp;€</div><span class="faint">pro Monat</span><ul><li>50 GB Speicher</li><li>Eigene Subdomain + HTTPS</li><li>Tägliche Backups</li></ul></div>
+      <div class="tier"><h3>Jellyfin <span class="faint" style="font-size:12px">· bald</span></h3><div class="amt">7&nbsp;€</div><span class="faint">pro Monat</span><ul><li>Hardware-Transcoding</li><li>Eigene Subdomain + HTTPS</li><li>Tägliche Backups</li></ul></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="band">
+      <h2>Deine erste App ist in fünf Minuten live.</h2>
+      <p class="muted" style="margin:12px auto 24px;max-width:48ch">Konto anlegen, App wählen, loslegen — ohne Server-Know-how.</p>
+      <a class="btn primary" href="#" style="height:48px;padding:0 26px">Kostenlos starten →</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="fcols">
+      <div class="brand"><span class="logo">D</span> DynStore</div>
+      <div class="fcol"><b>Produkt</b><a href="#apps">Apps</a><a href="#pricing">Preise</a><a href="#how">So funktioniert's</a></div>
+      <div class="fcol"><b>Konto</b><a href="#">Login</a><a href="#">Registrieren</a><a href="#">Dashboard</a></div>
+      <div class="fcol"><b>Rechtliches</b><a href="#">Impressum</a><a href="#">AGB</a><a href="#">Datenschutz</a></div>
+    </div>
+    <div class="faint">© 2026 DynStore · Design-Vorschau (Platzhalter) · Gehostet in Deutschland</div>
+  </div>
+</footer>
+
+</body>
+</html>

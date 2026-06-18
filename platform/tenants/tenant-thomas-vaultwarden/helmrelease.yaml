@@ -1,0 +1,24 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: thomas-vaultwarden
+  namespace: flux-system
+spec:
+  interval: 10m
+  releaseName: vaultwarden
+  targetNamespace: tenant-thomas-vaultwarden
+  storageNamespace: tenant-thomas-vaultwarden
+  install: { createNamespace: false }
+  upgrade: { remediation: { retries: 3 } }
+  chart:
+    spec:
+      chart: ./platform/catalog/vaultwarden
+      sourceRef: { kind: GitRepository, name: flux-system, namespace: flux-system }
+  values:
+    username: thomas
+    appName: vaultwarden
+    baseDomain: dyndnsv4.de
+    replicas: 1
+    storage: { size: 5Gi }
+    ingress:
+      certIssuer: letsencrypt-prod
