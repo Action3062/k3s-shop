@@ -83,3 +83,12 @@ export async function reinstallService(formData: FormData) {
   if (customerId && id) await serviceAction(customerId, id, "reinstall").catch(() => null);
   redirect("/dashboard?reinstalled=1");
 }
+
+export async function regenerateTokenService(formData: FormData) {
+  const session = await auth();
+  if (!session) redirect("/login");
+  const customerId = (session as { customerId?: string }).customerId;
+  const id = String(formData.get("serviceId") ?? "");
+  if (customerId && id) await serviceAction(customerId, id, "regenerate-token").catch(() => null);
+  redirect("/dashboard?tokenregenerated=1");
+}

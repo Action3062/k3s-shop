@@ -1,8 +1,9 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
-import { logout, startService, stopService, restartService, reinstallService } from "@/app/actions";
-import { getServices } from "@/lib/controlPlane";
+import { logout, startService, stopService, restartService, reinstallService, regenerateTokenService } from "@/app/actions";
+import { getServices, getServiceToken } from "@/lib/controlPlane";
+import { TokenField } from "@/components/TokenField";
 
 export const metadata = { title: "Meine Dienste — MeinAppNest" };
 
@@ -11,11 +12,17 @@ const STATUS: Record<string, string> = {
   SUSPENDED: "#FBBF24", DEPROVISIONING: "#9DB0BE", DEPROVISIONED: "#65788A", FAILED: "#FB7185",
 };
 
-export default async function Dashboard({ searchParams }: { searchParams: { error?: string; reinstalled?: string } }) {
+export default async function Dashboard({ searchParams }: { searchParams: { error?: string; reinstalled?: string; tokenregenerated?: string } }) {
   const session = await auth();
   if (!session) redirect("/login");
   const customerId = (session as { customerId?: string }).customerId ?? "";
   const services = customerId ? await getServices(customerId) : [];
+
+  // Gateway-Tokens für OpenClaw-Instanzen laden
+  const tokenEntries = await Promise.all(
+    services.filter((s) => s.appSlug === "openclaw").map(async (s) => [s.id, await getServiceToken(customerId, s.id)] as const),
+  );
+  const tokens: Record<string, string | null> = Object.fromEntries(tokenEntries);
 
   return (
     <section className="wrap py-16">
@@ -30,6 +37,7 @@ export default async function Dashboard({ searchParams }: { searchParams: { erro
 
       {searchParams.error === "pw" && <div className="mb-6 text-sm rounded-xl px-4 py-3 border border-red-500/40 text-red-400">Falsches Passwort — Neuinstallation abgebrochen.</div>}
       {searchParams.reinstalled && <div className="mb-6 text-sm rounded-xl px-4 py-3 border border-ok/40 text-ok">Neuinstallation gestartet — die Instanz wird mit leeren Daten neu aufgebaut.</div>}
+      {searchParams.tokenregenerated && <div className="mb-6 text-sm rounded-xl px-4 py-3 border border-ok/40 text-ok">Neues Gateway-Token erzeugt — die Instanz startet kurz neu.</div>}
 
       {services.length === 0 ? (
         <div className="card text-center py-14">
@@ -41,6 +49,7 @@ export default async function Dashboard({ searchParams }: { searchParams: { erro
           {services.map((s) => {
             const color = STATUS[s.status] ?? "#9DB0BE";
             const running = s.status === "RUNNING";
+            const token = tokens[s.id];
             return (
               <div key={s.id} className="card">
                 <div className="flex items-start justify-between">
@@ -51,6 +60,16 @@ export default async function Dashboard({ searchParams }: { searchParams: { erro
                   <span className="pill h-7 text-[11px] mono"><span className="dot pulse-soft" style={{ background: color, boxShadow: `0 0 8px ${color}` }} />{s.status}</span>
                 </div>
                 <a href={s.url} className="block mono text-[13px] text-accent-ink mt-4 hover:underline truncate">{s.url}</a>
+
+                {s.appSlug === "openclaw" && (
+                  <div className="mt-4 rounded-xl border border-line bg-surface/40 p-3">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="mono text-[11px] uppercase tracking-wider text-faint">Gateway-Token</span>
+                      <form action={regenerateTokenService}><input type="hidden" name="serviceId" value={s.id} /><button className="text-[12px] text-accent-ink hover:underline" type="submit">Neu generieren</button></form>
+                    </div>
+                    {token ? <TokenField token={token} /> : <span className="text-[13px] text-faint">Token wird erstellt…</span>}
+                  </div>
+                )}
 
                 <div className="flex flex-wrap gap-2 mt-5 pt-4 border-t border-line">
                   <a href={s.url} className="btn btn-ghost h-9 px-4 text-[14px]">Öffnen</a>

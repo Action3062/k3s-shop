@@ -50,7 +50,7 @@ export async function startCheckout(customerId: string, planId: string): Promise
 export async function serviceAction(
   customerId: string,
   id: string,
-  action: "start" | "stop" | "restart" | "reinstall",
+  action: "start" | "stop" | "restart" | "reinstall" | "regenerate-token",
 ): Promise<boolean> {
   if (!BASE) return false;
   try {
@@ -58,5 +58,15 @@ export async function serviceAction(
     return true;
   } catch {
     return false;
+  }
+}
+
+export async function getServiceToken(customerId: string, id: string): Promise<string | null> {
+  if (!BASE) return null;
+  try {
+    const r = await cp<{ token: string | null }>(`/v1/services/${id}/token`, { customerId });
+    return r.token;
+  } catch {
+    return null;
   }
 }
