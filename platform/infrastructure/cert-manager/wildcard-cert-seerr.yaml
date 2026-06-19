@@ -1,0 +1,20 @@
+# Wildcard-Zertifikat für *.seerr.meinappnest.org, via Reflector in tenant-*-seerr gespiegelt.
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: wildcard-seerr
+  namespace: cert-manager
+spec:
+  secretName: wildcard-seerr-tls
+  secretTemplate:
+    annotations:
+      reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
+      reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces: "tenant-.*-seerr"
+      reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
+      reflector.v1.k8s.emberstack.com/reflection-auto-namespaces: "tenant-.*-seerr"
+  issuerRef:
+    name: letsencrypt-cloudflare
+    kind: ClusterIssuer
+  commonName: "*.seerr.meinappnest.org"
+  dnsNames:
+    - "*.seerr.meinappnest.org"

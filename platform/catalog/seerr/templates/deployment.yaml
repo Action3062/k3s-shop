@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "seerr.fullname" . }}
+  labels:
+    app: seerr
+spec:
+  replicas: {{ .Values.replicas }}
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: seerr
+  template:
+    metadata:
+      labels:
+        app: seerr
+      annotations:
+        meinappnest.io/restart-token: "{{ .Values.restartToken | default "" }}"
+    spec:
+      imagePullSecrets:
+        - name: ghcr-pull
+      containers:
+        - name: seerr
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.port | default 5055 }}
+          env:
+            - name: PORT
+              value: "{{ .Values.port | default 5055 }}"
+            - name: CONFIG_DIRECTORY
+              value: /app/config
+          volumeMounts:
+            - name: data
+              mountPath: /app/config
+          resources: {{ toYaml .Values.resources | nindent 12 }}
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: {{ include "seerr.fullname" . }}-data-v{{ .Values.dataVersion | default 1 }}

@@ -4,3 +4,4 @@ resources:
   - clusterissuer-dns01.yaml
   - wildcard-cert.yaml          # vaultwarden — pro weiterer App eine Kopie ergaenzen
   - wildcard-cert-openclaw.yaml
+  - wildcard-cert-seerr.yaml

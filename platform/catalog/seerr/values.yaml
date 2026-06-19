@@ -1,0 +1,32 @@
+# Pro-Tenant-Werte injiziert die Control-Plane über die HelmRelease.
+username: ""             # DNS-Label des Kunden
+appName: seerr           # App-Label in der Domain
+baseDomain: meinappnest.org  # Host = <username>.<appName>.<baseDomain>
+
+replicas: 1              # 0 = suspendiert
+
+image:
+  repository: ghcr.io/action3062/seerr
+  tag: "v3.3.0"
+  pullPolicy: IfNotPresent
+
+# Seerr (Overseerr/Jellyseerr) lauscht auf 5055, Config in /app/config
+port: 5055
+
+storage:
+  size: 5Gi
+  storageClassName: hcloud-volumes
+
+resources:
+  requests: { cpu: 100m, memory: 256Mi }
+  limits:   { cpu: 500m, memory: 512Mi }
+
+ingress:
+  className: traefik
+  entrypoint: websecure
+  useDefaultWildcardCert: false   # nutzt das gespiegelte Wildcard-Secret pro App
+  certIssuer: ""
+
+# Lifecycle (von der Control-Plane gesetzt)
+restartToken: ""
+dataVersion: 1
