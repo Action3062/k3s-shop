@@ -6,9 +6,12 @@ baseDomain: meinappnest.org  # Host = <username>.<appName>.<baseDomain>
 replicas: 1              # 0 = suspendiert
 
 image:
-  repository: vaultwarden/server
-  tag: "1.32.0"
+  repository: ghcr.io/action3062/vaultwarden
+  tag: "1.36.0"
   pullPolicy: IfNotPresent
+
+# Vaultwarden (Rocket) lauscht im MeinAppNest-Image auf 8000 (offizielles vaultwarden/server: 80)
+port: 8000
 
 storage:
   size: 5Gi

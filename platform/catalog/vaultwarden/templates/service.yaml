@@ -7,4 +7,4 @@ spec:
     app: vaultwarden
   ports:
     - port: 80
-      targetPort: 80
+      targetPort: {{ .Values.port | default 8000 }}
