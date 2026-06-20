@@ -19,6 +19,8 @@ spec:
           ports:
             - containerPort: 3000
           env:
+            - name: CONTROL_PLANE_URL
+              value: "http://control-plane.dynstore.svc.cluster.local:8080"
             - name: NEXT_PUBLIC_APP_URL
               value: "https://store.meinappnest.org"
             - name: NEXT_TELEMETRY_DISABLED

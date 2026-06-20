@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import { getCatalog } from "@/lib/controlPlane";
 import { AppCard } from "@/components/AppCard";
 
