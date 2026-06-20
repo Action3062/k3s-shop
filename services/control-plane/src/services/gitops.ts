@@ -61,7 +61,12 @@ export async function removePathAndCommit(relPath: string, message: string): Pro
   await pull(git);
   const full = path.join(config.GITOPS_WORKDIR, relPath);
   await fs.rm(full, { recursive: true, force: true });
-  await git.raw(['add', '-A', relPath]);
+  await git.raw(['add', '-A']); // ganzes Workdir stagen -> kein pathspec-Fehler, falls Pfad nie existierte
+  const status = await git.status();
+  if (status.files.length === 0) {
+    logger.info({ relPath }, 'gitops remove: nichts zu committen (Pfad bereits weg) — idempotent');
+    return '';
+  }
   const res = await git.commit(message);
   await git.push('origin', config.GITOPS_REPO_BRANCH);
   logger.info({ commit: res.commit, removed: relPath }, 'gitops remove+push');

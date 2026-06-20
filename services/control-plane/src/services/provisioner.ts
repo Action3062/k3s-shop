@@ -87,6 +87,11 @@ export async function provisionInstance(instanceId: string): Promise<void> {
 /** Remove the tenant directory (Flux prune deletes namespace + workloads). */
 export async function deprovisionInstance(instanceId: string): Promise<void> {
   const inst = await prisma.serviceInstance.findUniqueOrThrow({ where: { id: instanceId } });
+  // Idempotent: bereits entfernt -> nichts tun (verhindert doppelte Laeufe via Sweep/Job/Webhook)
+  if (inst.status === 'DEPROVISIONED') {
+    logger.info({ instanceId }, 'deprovision skipped (already deprovisioned)');
+    return;
+  }
   await prisma.serviceInstance.update({ where: { id: instanceId }, data: { status: 'DEPROVISIONING' } });
   await removePathAndCommit(tenantDir(inst.namespace), `deprovision: ${inst.namespace}`);
   // Tombstone: @unique-Felder freigeben, damit derselbe Kunde dieselbe App erneut bestellen kann.
