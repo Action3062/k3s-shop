@@ -89,8 +89,18 @@ export async function deprovisionInstance(instanceId: string): Promise<void> {
   const inst = await prisma.serviceInstance.findUniqueOrThrow({ where: { id: instanceId } });
   await prisma.serviceInstance.update({ where: { id: instanceId }, data: { status: 'DEPROVISIONING' } });
   await removePathAndCommit(tenantDir(inst.namespace), `deprovision: ${inst.namespace}`);
-  await prisma.serviceInstance.update({ where: { id: instanceId }, data: { status: 'DEPROVISIONED' } });
-  logger.info({ instanceId, namespace: inst.namespace }, 'instance deprovisioned');
+  // Tombstone: @unique-Felder freigeben, damit derselbe Kunde dieselbe App erneut bestellen kann.
+  // Ohne das blockiert der alte Datensatz namespace/subdomain -> Neu-Provisionierung scheitert an P2002.
+  const freed = `removed-${Date.now().toString(36)}-${instanceId.slice(-6)}`;
+  await prisma.serviceInstance.update({
+    where: { id: instanceId },
+    data: {
+      status: 'DEPROVISIONED',
+      namespace: `${inst.namespace}-${freed}`.slice(0, 63),
+      subdomain: `${inst.subdomain}-${freed}`,
+    },
+  });
+  logger.info({ instanceId, namespace: inst.namespace }, 'instance deprovisioned (unique freed)');
 }
 
 export { chartValues };
