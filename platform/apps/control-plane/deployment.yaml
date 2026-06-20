@@ -15,7 +15,7 @@ spec:
       serviceAccountName: control-plane
       containers:
         - name: control-plane
-          image: ghcr.io/action3062/dynstore-control-plane:20260618213326 # {"$imagepolicy": "flux-system:control-plane"}
+          image: ghcr.io/action3062/dynstore-control-plane:20260620204209 # {"$imagepolicy": "flux-system:control-plane"}
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8080
