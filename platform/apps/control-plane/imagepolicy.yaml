@@ -1,0 +1,13 @@
+apiVersion: image.toolkit.fluxcd.io/v1beta2
+kind: ImagePolicy
+metadata:
+  name: control-plane
+  namespace: flux-system
+spec:
+  imageRepositoryRef:
+    name: control-plane
+  filterTags:
+    pattern: '^[0-9]{14}$'   # CI Timestamp-Tag YYYYMMDDHHmmss
+  policy:
+    numerical:
+      order: asc             # höchster Timestamp = neuestes Image
