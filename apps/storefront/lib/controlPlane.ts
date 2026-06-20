@@ -86,3 +86,14 @@ export async function adminDeprovision(id: string): Promise<boolean> {
   try { await cp(`/v1/admin/services/${id}`, { method: "DELETE" }); return true; }
   catch { return false; }
 }
+
+// Stripe Billing Portal (Phase 4) — Endpunkt optional; null => UI zeigt Hinweis.
+export async function billingPortal(customerId: string): Promise<string | null> {
+  if (!BASE) return null;
+  try {
+    const r = await cp<{ url: string }>("/v1/billing/portal", { method: "POST", customerId });
+    return r.url;
+  } catch {
+    return null;
+  }
+}

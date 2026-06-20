@@ -2,34 +2,32 @@ import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/db";
+import { authConfig } from "@/auth.config";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
-  session: { strategy: "jwt" },
-  pages: { signIn: "/login" },
+  ...authConfig,
   providers: [
     Credentials({
-      credentials: { email: {}, password: {} },
+      // "remember" steuert "Angemeldet bleiben" (siehe login-Action: Cookie-Downgrade)
+      credentials: { email: {}, password: {}, remember: {} },
       async authorize(creds) {
         const email = String(creds?.email ?? "").toLowerCase();
         const password = String(creds?.password ?? "");
+        const remember = String(creds?.remember ?? "") === "true";
         if (!email || !password) return null;
         const user = await prisma.user.findUnique({ where: { email }, include: { customer: true } });
         if (!user?.passwordHash) return null;
         const ok = await bcrypt.compare(password, user.passwordHash);
         if (!ok) return null;
-        return { id: user.id, email: user.email, name: user.name ?? user.username, customerId: user.customer?.id ?? null, role: user.role } as any;
+        return {
+          id: user.id,
+          email: user.email,
+          name: user.name ?? user.username,
+          customerId: user.customer?.id ?? null,
+          role: user.role,
+          remember,
+        } as { id: string; email: string; name: string; customerId: string | null; role: string; remember: boolean };
       },
     }),
   ],
-  callbacks: {
-    async jwt({ token, user }) {
-      if (user) { (token as any).customerId = (user as any).customerId; (token as any).uid = (user as any).id; (token as any).role = (user as any).role; }
-      return token;
-    },
-    async session({ session, token }) {
-      (session as any).customerId = (token as any).customerId ?? null;
-      if (session.user) { (session.user as any).id = (token as any).uid ?? null; (session.user as any).role = (token as any).role ?? "USER"; }
-      return session;
-    },
-  },
 });

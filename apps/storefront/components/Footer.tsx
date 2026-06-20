@@ -1,6 +1,11 @@
+"use client";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 export function Footer() {
+  const path = usePathname() ?? "";
+  if (path.startsWith("/dashboard") || path.startsWith("/gate")) return null;
+
   const cols: Record<string, [string, string][]> = {
     Produkt: [["Apps", "/catalog"], ["Preise", "/pricing"], ["Anmelden", "/signup"]],
     Rechtliches: [["Impressum", "/impressum"], ["Datenschutz", "/datenschutz"], ["AGB", "/agb"]],
