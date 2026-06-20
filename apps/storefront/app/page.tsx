@@ -3,7 +3,7 @@ import { getCatalog } from "@/lib/controlPlane";
 import { AppCard } from "@/components/AppCard";
 import type { CatalogApp } from "@/lib/types";
 
-const AVAILABLE = new Set(["vaultwarden", "openclaw"]);
+const AVAILABLE = new Set(["vaultwarden", "openclaw", "seerr"]);
 
 const UPCOMING: CatalogApp[] = [
   { slug: "jellyfin", name: "Jellyfin", category: "Media", description: "Streame Filme, Serien und Musik von überall – werbefrei.", plans: [{ id: "x", name: "Standard", priceCents: 700, interval: "month", storageGi: 10 }] },

@@ -1,7 +1,7 @@
 import { getCatalog } from "@/lib/controlPlane";
 import { AppCard } from "@/components/AppCard";
 
-const AVAILABLE = new Set(["vaultwarden", "openclaw"]);
+const AVAILABLE = new Set(["vaultwarden", "openclaw", "seerr"]);
 
 export const metadata = { title: "Apps — MeinAppNest" };
 
