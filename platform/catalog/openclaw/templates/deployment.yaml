@@ -37,9 +37,8 @@ spec:
             - |
               set -euo pipefail
               install -d -m 0755 "${HOME}/.openclaw" "${HOME}/.openclaw/workspace" "${HOME}/.config/openclaw" "${HOME}/.local/share"
-              # eingebaute Web-Shell (ttyd) unter {{ .Values.webcli.basePath }}, abgesichert mit dem Gateway-Zugang
-              ttyd --port {{ .Values.webcli.port }} --interface 0.0.0.0 --base-path {{ .Values.webcli.basePath }} --writable \
-                --credential "${OPENCLAW_GATEWAY_AUTH_USER}:${OPENCLAW_GATEWAY_AUTH_PASSWORD}" /launch-tmux.sh &
+              # eingebaute Web-Shell (ttyd) unter {{ .Values.webcli.basePath }}; Zugriff via Storefront-Gate (forwardAuth)
+              ttyd --port {{ .Values.webcli.port }} --interface 0.0.0.0 --base-path {{ .Values.webcli.basePath }} --writable /launch-tmux.sh &
               gw=()
               [ -f "${HOME}/.config/openclaw/config.json" ] || gw+=(--allow-unconfigured)
               exec node /app/dist/index.js gateway \
@@ -51,16 +50,11 @@ spec:
             # bind=lan explizit setzen (überschreibt den loopback-Default im Image)
             - name: OPENCLAW_GATEWAY_BIND
               value: {{ .Values.gatewayBind | quote }}
-            - name: OPENCLAW_GATEWAY_AUTH_USER
+            - name: OPENCLAW_GATEWAY_TOKEN
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Values.gatewayAuthSecretName }}
-                  key: {{ .Values.gatewayAuthUserKey }}
-            - name: OPENCLAW_GATEWAY_AUTH_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Values.gatewayAuthSecretName }}
-                  key: {{ .Values.gatewayAuthPasswordKey }}
+                  name: {{ .Values.gatewayTokenSecretName }}
+                  key: {{ .Values.gatewayTokenSecretKey }}
           volumeMounts:
             - { name: data, mountPath: /config }
             - { name: tmp, mountPath: /tmp }

@@ -69,7 +69,7 @@ export async function provisionInstance(instanceId: string): Promise<void> {
   if (inst.appSlug === 'openclaw') {
     const token = generateGatewayToken();
     await prisma.serviceInstance.update({ where: { id: instanceId }, data: { gatewayToken: token } });
-    files[`${dir}/secret.sops.yaml`] = await encryptSecretYaml(renderGatewaySecret(inst.namespace, inst.username, token));
+    files[`${dir}/secret.sops.yaml`] = await encryptSecretYaml(renderGatewaySecret(inst.namespace, token));
   }
 
   // 3) Commit -> Flux reconciled

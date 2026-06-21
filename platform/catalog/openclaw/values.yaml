@@ -30,11 +30,10 @@ ingress:
   useDefaultWildcardCert: false   # nutzt das gespiegelte Wildcard-Secret pro App
   certIssuer: ""                  # leer => kein HTTP-01 pro Host
 
-# Gateway-Zugang (Benutzer + Passwort). Secret wird von der Control-Plane
-# out-of-band verwaltet (NICHT in Git). Ersetzt das frühere OPENCLAW_GATEWAY_TOKEN.
-gatewayAuthSecretName: openclaw-secrets
-gatewayAuthUserKey: OPENCLAW_GATEWAY_AUTH_USER
-gatewayAuthPasswordKey: OPENCLAW_GATEWAY_AUTH_PASSWORD
+# Gateway-Token: Secret wird von der Control-Plane out-of-band verwaltet (NICHT in Git).
+# Die neue Image (App) authentifiziert per Token (env OPENCLAW_GATEWAY_TOKEN / --token).
+gatewayTokenSecretName: openclaw-secrets
+gatewayTokenSecretKey: OPENCLAW_GATEWAY_TOKEN
 
 # Lifecycle (Control-Plane)
 restartToken: ""         # Änderung erzwingt Pod-Neustart

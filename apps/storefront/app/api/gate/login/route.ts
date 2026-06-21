@@ -36,6 +36,11 @@ export async function POST(req: NextRequest) {
 
   let target = `https://${host}/`;
   if (rd && rd.startsWith(`https://${host}/`)) target = rd;
+  try {
+    if (inst.appSlug === "openclaw" && new URL(target).pathname === "/") {
+      target += `#token=${inst.gatewayToken}`;
+    }
+  } catch {}
 
   const res = NextResponse.redirect(target, 302);
   res.cookies.set(GATE_COOKIE, signGate(host), {
