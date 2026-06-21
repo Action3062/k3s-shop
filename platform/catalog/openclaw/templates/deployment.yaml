@@ -37,6 +37,9 @@ spec:
             - |
               set -euo pipefail
               install -d -m 0755 "${HOME}/.openclaw" "${HOME}/.openclaw/workspace" "${HOME}/.config/openclaw" "${HOME}/.local/share"
+              # Control-UI Origin-Allowlist (Pflicht fuer Public-Origin hinter dem Ingress; ohne -> WS 4008 InvalidOrigin).
+              # Merge-preserving: bestehende Config bleibt erhalten, nur allowedOrigins wird gesetzt.
+              node -e 'const fs=require("fs"),p=process.env.HOME+"/.openclaw/openclaw.json";let c={};try{c=JSON.parse(fs.readFileSync(p,"utf8"))}catch(e){}c.gateway=c.gateway||{};c.gateway.controlUi=c.gateway.controlUi||{};c.gateway.controlUi.allowedOrigins=["https://{{ include "openclaw.host" . }}"];fs.writeFileSync(p,JSON.stringify(c,null,2))'
               # eingebaute Web-Shell (ttyd) unter {{ .Values.webcli.basePath }}; Zugriff via Storefront-Gate (forwardAuth)
               ttyd --port {{ .Values.webcli.port }} --interface 0.0.0.0 --base-path {{ .Values.webcli.basePath }} --writable /launch-tmux.sh &
               gw=()

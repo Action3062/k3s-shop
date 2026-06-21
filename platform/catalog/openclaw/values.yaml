@@ -13,7 +13,7 @@ image:
 # OpenClaw-Gateway-Port (Control-UI + Gateway-API)
 port: 18789
 # Bind-Modus: lan = an der Pod-IP lauschen (vom Service erreichbar). Das Image
-# verweigert den LAN-Start ohne Auth-Credentials (siehe gatewayAuth* / Secret).
+# Das Image erzwingt Auth bei Nicht-loopback-Bind; wir liefern OPENCLAW_GATEWAY_TOKEN.
 gatewayBind: lan
 
 storage:
