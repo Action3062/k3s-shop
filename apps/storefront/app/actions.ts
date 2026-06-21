@@ -167,3 +167,22 @@ export async function openBillingPortal() {
   const url = await billingPortal(customerId).catch(() => null);
   redirect(url ?? "/dashboard/billing?portal=unavailable");
 }
+
+/** Beendeten (DEPROVISIONED) Server endgültig aus dem Dashboard/DB entfernen.
+ *  Cluster + Daten sind beim Deprovisionieren bereits weg; hier wird nur noch der
+ *  Grabstein-Datensatz (ServiceInstance + abhängige Backups/Jobs) gelöscht.
+ *  Die Subscription bleibt als Rechnungs-Historie erhalten. */
+export async function forgetService(formData: FormData) {
+  const session = await auth();
+  if (!session) redirect("/login");
+  const customerId = (session as { customerId?: string }).customerId;
+  const id = String(formData.get("serviceId") ?? "");
+  if (!customerId || !id) redirect("/dashboard/apps");
+  const inst = await prisma.serviceInstance.findUnique({ where: { id }, include: { subscription: true } });
+  if (!inst || inst.subscription.customerId !== customerId) redirect("/dashboard/apps?error=notfound");
+  if (inst.status !== "DEPROVISIONED") redirect("/dashboard/apps?error=notended");
+  await prisma.backup.deleteMany({ where: { instanceId: id } });
+  await prisma.provisioningJob.deleteMany({ where: { instanceId: id } });
+  await prisma.serviceInstance.delete({ where: { id } });
+  redirect("/dashboard/apps?removed=1");
+}

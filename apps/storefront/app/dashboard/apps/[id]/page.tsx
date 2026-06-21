@@ -5,7 +5,7 @@ import { getServices, getServiceToken } from "@/lib/controlPlane";
 import { instanceMeta, formatDate } from "@/lib/dashboard";
 import { StatusBadge } from "@/components/dashboard/StatusBadge";
 import { TokenField } from "@/components/TokenField";
-import { startService, stopService, restartService, reinstallService, regenerateTokenService } from "@/app/actions";
+import { startService, stopService, restartService, reinstallService, regenerateTokenService, forgetService } from "@/app/actions";
 
 export default async function ServiceDetail({ params, searchParams }: {
   params: { id: string };
@@ -19,10 +19,45 @@ export default async function ServiceDetail({ params, searchParams }: {
   if (!s) notFound();
 
   const running = s.status === "RUNNING";
-  const isOpenClaw = s.appSlug === "openclaw";
-  const token = isOpenClaw ? await getServiceToken(customerId, s.id) : null;
+  const ended = s.status === "DEPROVISIONED";
   const back = `/dashboard/apps/${s.id}`;
   const meta = instanceMeta(s.status);
+
+  // Beendeter Server: nichts mehr zu oeffnen oder zu verwalten — nur Info + endgueltiges Entfernen.
+  if (ended) {
+    return (
+      <section className="max-w-[860px]">
+        <Link href="/dashboard/apps" className="inline-flex items-center gap-2 text-muted text-[13.5px] hover:text-accent-ink mb-3">← Zurück zu Meine Software</Link>
+
+        <div className="flex items-start justify-between gap-4 flex-wrap">
+          <div className="flex items-center gap-3.5">
+            <span className="chip h-12 w-12 text-[20px]">{s.name.charAt(0)}</span>
+            <div><h1 className="text-[24px] font-semibold tracking-[-0.02em]">{s.name}</h1><p className="mono text-[11px] text-faint uppercase tracking-wider">{s.appSlug}</p></div>
+          </div>
+          <StatusBadge status={s.status} />
+        </div>
+
+        <div className="card mt-6">
+          <h2 className="text-[15px] font-semibold mb-2">Beendet</h2>
+          <p className="text-muted text-[14px] leading-relaxed mb-3">Dieser Server wurde beendet. Der Dienst, sein Speicher und alle Daten wurden vollständig aus dem System entfernt — es gibt nichts mehr zu öffnen oder zu verwalten.</p>
+          <Row k="Status" v={meta.label} />
+          <Row k="Erstellt" v={formatDate(s.createdAt)} last />
+        </div>
+
+        <div className="mt-3.5 rounded-2xl border border-red-500/25 bg-red-500/[0.04] p-4">
+          <h2 className="text-[14px] font-semibold text-red-400 mb-1">Aus Dashboard entfernen</h2>
+          <p className="text-muted text-[13px] mb-3">Entfernt diesen beendeten Server endgültig aus deiner Übersicht. Deine Rechnungs-Historie bleibt unter „Abrechnung“ erhalten.</p>
+          <form action={forgetService}>
+            <input type="hidden" name="serviceId" value={s.id} />
+            <button type="submit" className="btn h-10 px-4 text-[14px] font-semibold" style={{ background: "#FB7185", color: "#1A0A0D" }}>Endgültig entfernen</button>
+          </form>
+        </div>
+      </section>
+    );
+  }
+
+  const isOpenClaw = s.appSlug === "openclaw";
+  const token = isOpenClaw ? await getServiceToken(customerId, s.id) : null;
 
   return (
     <section className="max-w-[860px]">
