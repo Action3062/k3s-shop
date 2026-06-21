@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: storefront
-          image: ghcr.io/action3062/dynstore-storefront:20260620162027 # {"$imagepolicy": "flux-system:storefront"}
+          image: ghcr.io/action3062/dynstore-storefront:20260621005021 # {"$imagepolicy": "flux-system:storefront"}
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 3000
