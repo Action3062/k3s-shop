@@ -1,3 +1,5 @@
+> ⚠️ **VERALTET — Phase-1-Historie.** Produktiv nutzt **Cloudflare DNS-01** (ClusterIssuer `letsencrypt-cloudflare`) und Domain **`meinappnest.org`**, nicht dynDNSv4/PowerDNS/RFC2136. Für neue Domains/Apps siehe **`runbook-new-domain.md`**. Dieses Dokument bleibt nur als historischer Kontext.
+
 # Runbook — Phase 1 anwenden (mutierend, mit Betreiber)
 
 Domain-Schema: `<username>.<appname>.dyndnsv4.de`. DNS+TLS über **dynDNSv4**.

@@ -1,5 +1,5 @@
 # BEISPIEL (in docs/, NICHT unter platform/tenants/ — sonst würde Flux es ausrollen).
-# So sieht eine von der Control-Plane generierte HelmRelease aus. Host: thomas.vaultwarden.dyndnsv4.de
+# So sieht eine von der Control-Plane generierte HelmRelease aus. Host: thomas.vaultwarden.meinappnest.org
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
@@ -19,6 +19,6 @@ spec:
   values:
     username: thomas
     appName: vaultwarden
-    baseDomain: dyndnsv4.de
+    baseDomain: meinappnest.org
     replicas: 1
     storage: { size: 5Gi }

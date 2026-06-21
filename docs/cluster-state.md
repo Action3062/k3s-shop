@@ -1,5 +1,7 @@
 # Verifizierter Cluster-Ist-Zustand (2026-06-18, read-only)
 
+> ⚠️ **Teilweise überholt.** DNS/TLS/Domain wurden nach diesem Snapshot auf Cloudflare DNS-01 + `meinappnest.org` umgestellt — siehe **Korrektur (2026-06-22)** am Ende.
+
 Geprüft über `KUBECONFIG=/home/admin/k3s-hz_kubeconfig.yaml` von der Admin-VM `192.168.20.135`.
 
 ## Topologie
@@ -34,3 +36,12 @@ Das bestehende `vault.dyn.dyndnsv4.de` bleibt als manuelle Referenz bestehen.
 ## Update (2026-06-18) — Domain & DNS
 - Tenant-Apps: `<username>.<appname>.dyndnsv4.de` (z. B. `thomas.vaultwarden.dyndnsv4.de`).
 - DNS+TLS über **dynDNSv4** (DynDNS-Update-API + ACME-DNS-01). Wildcard pro App.
+
+
+## Korrektur (2026-06-22) — DNS/TLS/Domain (GitOps-Ist)
+Abgeglichen mit `Action3062/k3s-shop@main`. Diese Werte ersetzen die DNS/TLS/Domain-Angaben oben:
+
+- **Domain:** Produktiv-Schema `<username>.<appname>.meinappnest.org`; Storefront `store.meinappnest.org`; Control-Plane `cp.meinappnest.org`. (`*.dyndnsv4.de` war Provisorium, stillgelegt.)
+- **TLS:** cert-manager **ClusterIssuer `letsencrypt-cloudflare` (DNS-01 via Cloudflare)**; ein Wildcard-Cert pro App, per Reflector in die Tenant-Namespaces gespiegelt. (Nicht mehr `letsencrypt-prod`/HTTP-01.)
+- **Live-Tenants (GitOps):** `tenant-action3062-jellyfin`, `tenant-action3062-radarr`, `tenant-action3062-seerr` — je mit Namespace + NetworkPolicy (default-deny) + ResourceQuota + LimitRange.
+- **Hinweis:** Der Pod-/Namespace-Laufzeitzustand oben ist Stand 2026-06-18; aktueller Laufzeitzustand via `kubectl` auf der Admin-VM.
