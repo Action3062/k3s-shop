@@ -15,11 +15,11 @@ export function createApp() {
   const app = express();
 
   // Stripe webhook needs the raw body — register before express.json().
-  app.post('/v1/stripe/webhook', express.raw({ type: '*/*' }), (req, res) => {
+  app.post('/v1/stripe/webhook', express.raw({ type: '*/*', limit: '1mb' }), (req, res) => {
     void stripeWebhook(req, res);
   });
 
-  app.use(express.json());
+  app.use(express.json({ limit: '1mb' }));
 
   app.get('/healthz', (_req, res) => res.json({ ok: true }));
 
