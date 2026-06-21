@@ -1,0 +1,94 @@
+# Isolationsmodell pro Tenant-App-Namespace (von der Control-Plane gerendert).
+# NetworkPolicy ist additiv (Allow-Vereinigung). Reihenfolge nur zur Lesbarkeit:
+#   1) default-deny            -> alles zu (Ingress + Egress)
+#   2) Ingress:  Traefik       + gleicher Tenant
+#   3) Egress:   DNS + Internet (ohne private Netze) + gleicher Tenant
+#
+# Mandantengrenze = Label dynstore.io/tenant. Gleicher Wert (Apps DESSELBEN
+# Kunden) => erlaubt; anderer Wert (anderer Kunde) => niemals. Das Label setzt
+# AUSSCHLIESSLICH die Plattform (gerendertes namespace.yaml via GitOps); Tenants
+# haben keinen Cluster-Schreibzugriff und koennen es nicht faelschen.
+
+# 1) Default-Deny fuer ALLES (Ingress + Egress)
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny
+  namespace: tenant-action3062-openclaw
+spec:
+  podSelector: {}
+  policyTypes: [Ingress, Egress]
+---
+# 2) Ingress nur aus der traefik-Namespace erlauben
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-traefik-ingress
+  namespace: tenant-action3062-openclaw
+spec:
+  podSelector: {}
+  policyTypes: [Ingress]
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: traefik
+---
+# 3) Egress: DNS zu CoreDNS + Internet, aber private Netze (Cluster/Tenants) blockieren
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-dns-and-internet-egress
+  namespace: tenant-action3062-openclaw
+spec:
+  podSelector: {}
+  policyTypes: [Egress]
+  egress:
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+      ports:
+        - { port: 53, protocol: UDP }
+        - { port: 53, protocol: TCP }
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+            except:
+              - 10.0.0.0/8
+              - 172.16.0.0/12
+              - 192.168.0.0/16
+---
+# 4) Intra-Tenant: Apps DESSELBEN Kunden duerfen miteinander reden.
+#    Gegenstueck zu (3): dort sind private Netze geblockt; hier werden gezielt
+#    nur Namespaces mit GLEICHEM dynstore.io/tenant wieder geoeffnet. Andere
+#    Kunden tragen einen anderen Tenant-Wert => bleiben ausgeschlossen.
+#    (Je App genau EIN Namespace => Namespace-Auswahl ist bereits app-genau.
+#     Engere Variante pro App-Beziehung/Port: networkpolicy-app-link.example.yaml)
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-intra-tenant-ingress
+  namespace: tenant-action3062-openclaw
+spec:
+  podSelector: {}
+  policyTypes: [Ingress]
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              dynstore.io/tenant: "action3062"
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-intra-tenant-egress
+  namespace: tenant-action3062-openclaw
+spec:
+  podSelector: {}
+  policyTypes: [Egress]
+  egress:
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              dynstore.io/tenant: "action3062"
