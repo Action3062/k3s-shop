@@ -27,10 +27,10 @@ spec:
     username: action3062
     appName: homepage
     baseDomain: meinappnest.org
-    replicas: 0
+    replicas: 1
     storage:
       size: 5Gi
     dataVersion: 1
-    restartToken: ""
+    restartToken: "1782073584937"
     image:
       tag: 1.13.2
