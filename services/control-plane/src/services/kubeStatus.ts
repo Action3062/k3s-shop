@@ -79,3 +79,70 @@ export async function getImagePolicyLatest(name: string): Promise<string | null>
     req.end();
   });
 }
+
+/** Generischer read-only GET gegen die Kubernetes-API (oder null). */
+function k8sGet(path: string): Promise<{ items?: unknown[] } | null> {
+  const { token, ca, host, port } = creds();
+  if (!token) return Promise.resolve(null);
+  return new Promise((resolve) => {
+    const req = https.request(
+      { host, port, method: 'GET', ca, path, headers: { authorization: `Bearer ${token}`, accept: 'application/json' } },
+      (res) => {
+        let body = '';
+        res.on('data', (d) => (body += d));
+        res.on('end', () => {
+          const code = res.statusCode ?? 500;
+          if (code >= 300) return resolve(null);
+          try { resolve(JSON.parse(body)); } catch { resolve(null); }
+        });
+      },
+    );
+    req.on('error', () => resolve(null));
+    req.setTimeout(4000, () => { req.destroy(); resolve(null); });
+    req.end();
+  });
+}
+
+export interface ClusterSummary {
+  reachable: boolean;
+  nodes: { ready: number; total: number };
+  pods: { running: number; pending: number; failed: number; total: number };
+  namespaces: number;
+}
+
+/** Cluster-Gesundheit auf einen Blick: Nodes ready/total, Pods nach Phase, Namespaces. */
+export async function getClusterSummary(): Promise<ClusterSummary> {
+  const empty: ClusterSummary = {
+    reachable: false,
+    nodes: { ready: 0, total: 0 },
+    pods: { running: 0, pending: 0, failed: 0, total: 0 },
+    namespaces: 0,
+  };
+  const [nodesRes, podsRes, nsRes] = await Promise.all([
+    k8sGet('/api/v1/nodes'),
+    k8sGet('/api/v1/pods'),
+    k8sGet('/api/v1/namespaces'),
+  ]);
+  if (!nodesRes && !podsRes && !nsRes) return empty;
+
+  const nodes = (nodesRes?.items ?? []) as Array<{ status?: { conditions?: Array<{ type?: string; status?: string }> } }>;
+  const nodeReady = nodes.filter((n) =>
+    (n.status?.conditions ?? []).some((c) => c.type === 'Ready' && c.status === 'True'),
+  ).length;
+
+  const pods = (podsRes?.items ?? []) as Array<{ status?: { phase?: string } }>;
+  let running = 0, pending = 0, failed = 0;
+  for (const p of pods) {
+    const ph = p.status?.phase;
+    if (ph === 'Running' || ph === 'Succeeded') running++;
+    else if (ph === 'Pending') pending++;
+    else if (ph === 'Failed') failed++;
+  }
+
+  return {
+    reachable: true,
+    nodes: { ready: nodeReady, total: nodes.length },
+    pods: { running, pending, failed, total: pods.length },
+    namespaces: (nsRes?.items ?? []).length,
+  };
+}

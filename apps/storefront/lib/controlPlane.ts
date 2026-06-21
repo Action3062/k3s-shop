@@ -87,6 +87,38 @@ export async function adminDeprovision(id: string): Promise<boolean> {
   catch { return false; }
 }
 
+export async function adminServiceAction(
+  id: string,
+  action: "start" | "stop" | "restart" | "reinstall" | "regenerate-token" | "backup",
+): Promise<boolean> {
+  if (!BASE) return false;
+  try {
+    await cp(`/v1/admin/services/${id}/${action}`, { method: "POST" });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+export interface ClusterSummary {
+  reachable: boolean;
+  nodes: { ready: number; total: number };
+  pods: { running: number; pending: number; failed: number; total: number };
+  namespaces: number;
+}
+
+export async function adminClusterSummary(): Promise<ClusterSummary> {
+  const empty: ClusterSummary = {
+    reachable: false,
+    nodes: { ready: 0, total: 0 },
+    pods: { running: 0, pending: 0, failed: 0, total: 0 },
+    namespaces: 0,
+  };
+  if (!BASE) return empty;
+  try { return await cp<ClusterSummary>("/v1/admin/cluster"); }
+  catch { return empty; }
+}
+
 // Stripe Billing Portal (Phase 4) — Endpunkt optional; null => UI zeigt Hinweis.
 export async function billingPortal(customerId: string): Promise<string | null> {
   if (!BASE) return null;

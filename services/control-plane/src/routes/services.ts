@@ -6,7 +6,7 @@ import { customerContext } from '../middleware/auth';
 import { enqueueJob } from '../services/jobQueue';
 import { scheduleDeprovision, suspendInstance, resumeInstance, restartInstance, reinstallInstance, regenerateGatewayToken } from '../services/lifecycle';
 import { deprovisionInstance } from '../services/provisioner';
-import { getDeploymentStatus, computeLiveStatus } from '../services/kubeStatus';
+import { getDeploymentStatus, computeLiveStatus, getClusterSummary } from '../services/kubeStatus';
 import { tagOf, appLatest } from '../services/versions';
 
 export const servicesRouter = Router();
@@ -121,4 +121,32 @@ servicesRouter.post('/services/:id/backup', asyncHandler(async (req, res) => {
   if (!inst) return res.status(404).json(errorBody('not_found', 'service not found'));
   await enqueueJob(req.params.id, 'BACKUP', `manual-${Date.now()}`);
   res.status(202).json({ enqueued: true });
+}));
+
+// ---- admin lifecycle (kundenuebergreifend; KEIN customerContext, nur serviceAuth) ----
+const ADMIN_LIFECYCLE: Record<string, (id: string) => Promise<unknown>> = {
+  start: resumeInstance,
+  stop: suspendInstance,
+  restart: restartInstance,
+  reinstall: reinstallInstance,
+  'regenerate-token': regenerateGatewayToken,
+};
+
+servicesRouter.post('/admin/services/:id/:action', asyncHandler(async (req, res) => {
+  const { id, action } = req.params;
+  const inst = await prisma.serviceInstance.findUnique({ where: { id } });
+  if (!inst) return res.status(404).json(errorBody('not_found', 'service not found'));
+  if (action === 'backup') {
+    await enqueueJob(id, 'BACKUP', `admin-${Date.now()}`);
+    return res.status(202).json({ enqueued: true, action });
+  }
+  const fn = ADMIN_LIFECYCLE[action];
+  if (!fn) return res.status(400).json(errorBody('invalid_action', `unknown action: ${action}`));
+  await fn(id);
+  res.status(202).json({ ok: true, action });
+}));
+
+// Cluster-Gesundheit (Nodes / Pods / Namespaces) fuer den Admin-Bereich.
+servicesRouter.get('/admin/cluster', asyncHandler(async (_req, res) => {
+  res.json(await getClusterSummary());
 }));

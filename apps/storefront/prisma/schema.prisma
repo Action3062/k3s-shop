@@ -178,3 +178,40 @@ model Backup {
   sizeBytes   BigInt?
   createdAt   DateTime        @default(now())
 }
+
+// ---- Admin-Erweiterung (Phase 5): Audit, Settings, Broadcast ----
+
+enum BroadcastLevel {
+  INFO
+  WARN
+  MAINT
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  actorEmail String
+  action     String
+  target     String?
+  detail     String?
+  createdAt  DateTime @default(now())
+
+  @@index([createdAt])
+}
+
+model Setting {
+  key       String   @id
+  value     String
+  updatedAt DateTime @updatedAt
+}
+
+model Broadcast {
+  id        String         @id @default(cuid())
+  title     String
+  body      String
+  level     BroadcastLevel @default(INFO)
+  active    Boolean        @default(true)
+  createdBy String?
+  createdAt DateTime       @default(now())
+
+  @@index([active])
+}
