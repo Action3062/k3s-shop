@@ -12,13 +12,26 @@ spec:
     - host: cp.meinappnest.org
       http:
         paths:
-          - path: /
+          # PUBLIC: nur der Stripe-Webhook (durch Stripe-Signatur geschützt).
+          - path: /v1/stripe/webhook
             pathType: Prefix
             backend:
               service:
                 name: control-plane
                 port:
                   number: 8080
+          # PUBLIC: nur Liveness-Probe für externes Uptime-Monitoring (read-only).
+          - path: /healthz
+            pathType: Exact
+            backend:
+              service:
+                name: control-plane
+                port:
+                  number: 8080
+  # Die Kunden-/Admin-/Billing-/Catalog-API (/v1/services, /v1/admin/*, /v1/billing,
+  # /v1/catalog) wird NICHT mehr öffentlich geroutet. Die Storefront erreicht die
+  # Control-Plane clusterintern über den Service control-plane.dynstore:8080
+  # (CONTROL_PLANE_URL). Nicht gematchte Pfade => Traefik 404 (kein Internet-Zugriff).
   tls:
     - hosts: [cp.meinappnest.org]
       secretName: cp-meinappnest-tls
