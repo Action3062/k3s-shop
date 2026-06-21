@@ -30,7 +30,7 @@ export default async function ServiceDetail({ params, searchParams }: {
 
       {searchParams.error === "pw" && <div className="mb-5 text-sm rounded-xl px-4 py-3 border border-red-500/40 text-red-400">Passwort stimmt nicht — Neuinstallation abgebrochen. Es wurde nichts verändert.</div>}
       {searchParams.reinstalled && <div className="mb-5 text-sm rounded-xl px-4 py-3 border border-ok/40 text-ok">Neuinstallation gestartet — die Instanz wird mit leeren Daten neu aufgebaut.</div>}
-      {searchParams.tokenregenerated && <div className="mb-5 text-sm rounded-xl px-4 py-3 border border-ok/40 text-ok">Neues Gateway-Token erzeugt — die Instanz startet kurz neu.</div>}
+      {searchParams.tokenregenerated && <div className="mb-5 text-sm rounded-xl px-4 py-3 border border-ok/40 text-ok">Neuer Gateway-Zugang erzeugt — die Instanz startet kurz neu.</div>}
 
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div className="flex items-center gap-3.5">
@@ -76,11 +76,12 @@ export default async function ServiceDetail({ params, searchParams }: {
         {isOpenClaw && (
           <div className="mt-5 rounded-xl border border-line bg-surface/40 p-3.5">
             <div className="flex items-center justify-between mb-2">
-              <span className="mono text-[11px] uppercase tracking-wider text-faint">Gateway-Token</span>
-              <form action={regenerateTokenService}><input type="hidden" name="serviceId" value={s.id} /><input type="hidden" name="returnTo" value={back} /><button className="text-[12px] text-accent-ink hover:underline" type="submit">Neu generieren</button></form>
+              <span className="mono text-[11px] uppercase tracking-wider text-faint">Gateway-Zugang</span>
+              <form action={regenerateTokenService}><input type="hidden" name="serviceId" value={s.id} /><input type="hidden" name="returnTo" value={back} /><button className="text-[12px] text-accent-ink hover:underline" type="submit">Passwort neu generieren</button></form>
             </div>
-            {token ? <TokenField token={token} /> : <span className="text-[13px] text-faint">Token wird erstellt…</span>}
-            <p className="mt-3 text-[11px] text-faint leading-relaxed">Provider verbinden im <b className="text-ink">OpenCLI</b>-Terminal, z. B.:<br /><code className="mono text-accent-ink">openclaw models auth login --provider openai-codex</code></p>
+            <div className="flex items-center justify-between py-1.5 text-[13px]"><span className="text-muted">Benutzer</span><code className="mono text-[12px] text-accent-ink">{s.username ?? s.subdomain?.split(".")[0]}</code></div>
+            {token ? <TokenField token={token} /> : <span className="text-[13px] text-faint">Passwort wird erstellt…</span>}
+            <p className="mt-3 text-[11px] text-faint leading-relaxed">Beim Öffnen mit <b className="text-ink">Benutzer + Passwort</b> anmelden. Provider verbinden im <b className="text-ink">OpenCLI</b>-Terminal, z. B.:<br /><code className="mono text-accent-ink">openclaw models auth login --provider openai-codex</code></p>
           </div>
         )}
       </div>

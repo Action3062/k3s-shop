@@ -21,50 +21,58 @@ spec:
       securityContext:
         runAsUser: 1000
         runAsNonRoot: true
-        fsGroup: 1000          # mountet das Volume gruppen-schreibbar für uid 1000
-      initContainers:
-        # Seed der Default-Config ins persistente Volume (nur falls noch nicht vorhanden),
-        # damit OpenClaw seine Config danach selbst verwalten kann.
-        - name: seed-config
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
-          command: ["sh", "-lc"]
-          args:
-            - |
-              set -e
-              mkdir -p /data
-              [ -f /data/openclaw.json ] || cp /config/openclaw.json /data/openclaw.json
-              [ -f /data/AGENTS.md ] || cp /config/AGENTS.md /data/AGENTS.md
-          volumeMounts:
-            - { name: data, mountPath: /data }
-            - { name: config, mountPath: /config, readOnly: true }
+        fsGroup: 1000          # Volume gruppen-schreibbar für uid 1000
       containers:
         - name: openclaw
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          # 'raw' umgeht den Image-Entrypoint, damit ttyd mit --base-path unter
+          # {{ .Values.webcli.basePath }} laufen kann (das eingebaute gateway-entrypoint.sh
+          # kann ttyd kein base-path geben -> würde hinter dem Ingress-Prefix brechen).
+          # Persistenz liegt unter HOME=/config (eigenes PVC).
+          args:
+            - raw
+            - /bin/bash
+            - -lc
+            - |
+              set -euo pipefail
+              install -d -m 0755 "${HOME}/.openclaw" "${HOME}/.openclaw/workspace" "${HOME}/.config/openclaw" "${HOME}/.local/share"
+              # eingebaute Web-Shell (ttyd) unter {{ .Values.webcli.basePath }}, abgesichert mit dem Gateway-Zugang
+              ttyd --port {{ .Values.webcli.port }} --interface 0.0.0.0 --base-path {{ .Values.webcli.basePath }} --writable \
+                --credential "${OPENCLAW_GATEWAY_AUTH_USER}:${OPENCLAW_GATEWAY_AUTH_PASSWORD}" /launch-tmux.sh &
+              gw=()
+              [ -f "${HOME}/.config/openclaw/config.json" ] || gw+=(--allow-unconfigured)
+              exec node /app/dist/index.js gateway \
+                --port {{ .Values.port }} --bind {{ .Values.gatewayBind }} ${gw[@]+"${gw[@]}"}
           ports:
-            - containerPort: {{ .Values.port }}
+            - { name: gateway, containerPort: {{ .Values.port }} }
+            - { name: cli, containerPort: {{ .Values.webcli.port }} }
           env:
-            - name: HOME
-              value: /home/node
-            - name: OPENCLAW_CONFIG_DIR
-              value: /home/node/.openclaw
-            - name: OPENCLAW_DISABLE_BONJOUR
-              value: "1"
-            - name: OPENCLAW_GATEWAY_TOKEN
+            # bind=lan explizit setzen (überschreibt den loopback-Default im Image)
+            - name: OPENCLAW_GATEWAY_BIND
+              value: {{ .Values.gatewayBind | quote }}
+            - name: OPENCLAW_GATEWAY_AUTH_USER
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Values.gatewayTokenSecretName }}
-                  key: {{ .Values.gatewayTokenSecretKey }}
+                  name: {{ .Values.gatewayAuthSecretName }}
+                  key: {{ .Values.gatewayAuthUserKey }}
+            - name: OPENCLAW_GATEWAY_AUTH_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.gatewayAuthSecretName }}
+                  key: {{ .Values.gatewayAuthPasswordKey }}
           volumeMounts:
-            - { name: data, mountPath: /home/node/.openclaw }
+            - { name: data, mountPath: /config }
             - { name: tmp, mountPath: /tmp }
           livenessProbe:
             httpGet: { path: /healthz, port: {{ .Values.port }} }
-            initialDelaySeconds: 20
+            initialDelaySeconds: 25
             periodSeconds: 15
             failureThreshold: 4
           readinessProbe:
-            httpGet: { path: /readyz, port: {{ .Values.port }} }
+            # /healthz (nicht /readyz): bleibt auch im unkonfigurierten Zustand grün,
+            # damit der Pod Ready wird und die Web-Shell für `openclaw setup` erreichbar ist.
+            httpGet: { path: /healthz, port: {{ .Values.port }} }
             initialDelaySeconds: 10
             periodSeconds: 10
           securityContext:
@@ -76,8 +84,5 @@ spec:
         - name: data
           persistentVolumeClaim:
             claimName: {{ include "openclaw.fullname" . }}-data-v{{ .Values.dataVersion | default 1 }}
-        - name: config
-          configMap:
-            name: {{ include "openclaw.fullname" . }}-config
         - name: tmp
           emptyDir: {}

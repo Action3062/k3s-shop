@@ -91,7 +91,7 @@ export async function regenerateGatewayToken(instanceId: string): Promise<void> 
   const token = generateGatewayToken();
   await prisma.serviceInstance.update({ where: { id: instanceId }, data: { gatewayToken: token } });
   const dir = tenantDir(inst.namespace);
-  const secret = await encryptSecretYaml(renderGatewaySecret(inst.namespace, token));
+  const secret = await encryptSecretYaml(renderGatewaySecret(inst.namespace, inst.username, token));
   const hr = renderHelmRelease({
     name: `${inst.username}-${inst.appSlug}`,
     namespace: inst.namespace,

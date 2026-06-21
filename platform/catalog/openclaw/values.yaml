@@ -6,12 +6,15 @@ baseDomain: meinappnest.org
 replicas: 1              # 0 = suspendiert
 
 image:
-  repository: ghcr.io/openclaw/openclaw
-  tag: "2026.6.8"       # offizielles GHCR-Image (Tags: main|latest|<version>)
+  repository: ghcr.io/action3062/openclaw   # selbst-gebautes, de-brandetes Image (MeinAppNest-Fork)
+  tag: "v2026.6.8"      # Tags: rolling | v<version>
   pullPolicy: IfNotPresent
 
-# OpenClaw lauscht auf 18789 (Gateway + Control-UI)
+# OpenClaw-Gateway-Port (Control-UI + Gateway-API)
 port: 18789
+# Bind-Modus: lan = an der Pod-IP lauschen (vom Service erreichbar). Das Image
+# verweigert den LAN-Start ohne Auth-Credentials (siehe gatewayAuth* / Secret).
+gatewayBind: lan
 
 storage:
   size: 10Gi             # Hetzner-Volumes Minimum = 10Gi
@@ -27,9 +30,11 @@ ingress:
   useDefaultWildcardCert: false   # nutzt das gespiegelte Wildcard-Secret pro App
   certIssuer: ""                  # leer => kein HTTP-01 pro Host
 
-# Gateway-Token: Secret wird von der Control-Plane out-of-band verwaltet (NICHT in Git).
-gatewayTokenSecretName: openclaw-secrets
-gatewayTokenSecretKey: OPENCLAW_GATEWAY_TOKEN
+# Gateway-Zugang (Benutzer + Passwort). Secret wird von der Control-Plane
+# out-of-band verwaltet (NICHT in Git). Ersetzt das frühere OPENCLAW_GATEWAY_TOKEN.
+gatewayAuthSecretName: openclaw-secrets
+gatewayAuthUserKey: OPENCLAW_GATEWAY_AUTH_USER
+gatewayAuthPasswordKey: OPENCLAW_GATEWAY_AUTH_PASSWORD
 
 # Lifecycle (Control-Plane)
 restartToken: ""         # Änderung erzwingt Pod-Neustart
@@ -39,12 +44,9 @@ gate:
   enabled: true
   verifyUrl: http://storefront.storefront.svc.cluster.local/api/gate/verify
 
+# Eingebaute Web-Shell (ttyd) der neuen Image — ersetzt den früheren webcli-Sidecar.
+# Läuft im OpenClaw-Container selbst (für `openclaw setup` etc.), Auth = Gateway-Zugang.
 webcli:
   enabled: true
-  image: ghcr.io/action3062/meinappnest-webcli
-  tag: v1
-  # Egress-Freigabe des CLI-Pods zum kube-apiserver (default-deny-Ausnahme)
-  apiServerCidr: 10.0.255.0/24
-  apiServerPort: 6443
-  apiServiceCidr: 10.0.64.1/32
-  apiServicePort: 443
+  port: 7681
+  basePath: /cli

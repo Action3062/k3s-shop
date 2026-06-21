@@ -6,5 +6,11 @@ spec:
   selector:
     app: openclaw
   ports:
-    - port: 80
+    - name: gateway
+      port: {{ .Values.port }}
       targetPort: {{ .Values.port }}
+    {{- if .Values.webcli.enabled }}
+    - name: cli
+      port: {{ .Values.webcli.port }}
+      targetPort: {{ .Values.webcli.port }}
+    {{- end }}
