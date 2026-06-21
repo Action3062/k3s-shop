@@ -6,5 +6,10 @@ spec:
   selector:
     app: radarr
   ports:
-    - port: 80
+    # 80 fuer den Ingress (Konvention), 7878 fuer Intra-Cluster *arr-Connectivity (Radarr-Standardport)
+    - name: http
+      port: 80
+      targetPort: {{ .Values.port | default 7878 }}
+    - name: radarr
+      port: {{ .Values.port | default 7878 }}
       targetPort: {{ .Values.port | default 7878 }}
