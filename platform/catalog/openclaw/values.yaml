@@ -7,7 +7,7 @@ replicas: 1              # 0 = suspendiert
 
 image:
   repository: ghcr.io/action3062/openclaw   # selbst-gebautes, de-brandetes Image (MeinAppNest-Fork)
-  tag: "v2026.6.8"      # Tags: rolling | v<version>
+  tag: "v2026.6.8" # {"$imagepolicy": "flux-system:openclaw:tag"}
   pullPolicy: IfNotPresent
 
 # OpenClaw-Gateway-Port (Control-UI + Gateway-API)

@@ -1,0 +1,8 @@
+apiVersion: image.toolkit.fluxcd.io/v1beta2
+kind: ImageRepository
+metadata:
+  name: openclaw
+  namespace: flux-system
+spec:
+  image: ghcr.io/action3062/openclaw
+  interval: 5m
