@@ -5,3 +5,5 @@ resources:
   - control-plane
   - storefront
   - openclaw
+  - seerr
+  - vaultwarden

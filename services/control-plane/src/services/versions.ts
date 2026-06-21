@@ -3,37 +3,37 @@ import { getImagePolicyLatest, getDeploymentStatus } from './kubeStatus';
 /** Extrahiert den Tag aus "repo:tag" (ohne Digest-Teil). */
 export function tagOf(image?: string | null): string | undefined {
   if (!image) return undefined;
-  const ref = image.split('@')[0];           // evtl. @sha256:... abschneiden
+  const ref = image.split('@')[0];
   const i = ref.lastIndexOf(':');
   return i > 0 ? ref.slice(i + 1) : undefined;
 }
 
-/** Neueste verfuegbare openclaw-Version laut Flux-ImagePolicy (z. B. "v2026.6.9"). */
-export async function openclawLatest(): Promise<string | undefined> {
-  return tagOf(await getImagePolicyLatest('openclaw'));
+/** Neueste verfuegbare Version laut Flux-ImagePolicy <appSlug>; undefined, wenn keine Policy existiert. */
+export async function appLatest(appSlug: string): Promise<string | undefined> {
+  return tagOf(await getImagePolicyLatest(appSlug));
 }
 
 /**
- * Tag, mit dem das HelmRelease gepinnt wird.
- * toLatest=true (Provision/Neustart) -> neueste Version; sonst aktuell laufende Version beibehalten.
- * Nur fuer openclaw; andere Apps bleiben beim Chart-Default (undefined).
+ * Tag zum Pinnen des HelmRelease.
+ * toLatest=true (Provision/Neustart) -> neueste Version; sonst laufende Version beibehalten.
+ * undefined (= kein Pin, Chart-Default) wenn fuer die App keine ImagePolicy existiert.
  */
-export async function resolveOpenclawTag(
+export async function resolveAppTag(
   inst: { appSlug: string; namespace: string },
   toLatest: boolean,
 ): Promise<string | undefined> {
-  if (inst.appSlug !== 'openclaw') return undefined;
-  const latest = await openclawLatest();
+  const latest = await appLatest(inst.appSlug);
+  if (!latest) return undefined;
   if (toLatest) return latest;
-  const cur = tagOf((await getDeploymentStatus(inst.namespace, 'openclaw')).image);
+  const cur = tagOf((await getDeploymentStatus(inst.namespace, inst.appSlug)).image);
   return cur ?? latest;
 }
 
-/** Liefert das in die HelmRelease-Values zu mergende image-Objekt ({} fuer Nicht-openclaw). */
-export async function openclawImageValues(
+/** image-Objekt zum Mergen in die HelmRelease-Values ({} wenn keine ImagePolicy/Version). */
+export async function appImageValues(
   inst: { appSlug: string; namespace: string },
   toLatest: boolean,
 ): Promise<Record<string, unknown>> {
-  const tag = await resolveOpenclawTag(inst, toLatest);
+  const tag = await resolveAppTag(inst, toLatest);
   return tag ? { image: { tag } } : {};
 }

@@ -5,7 +5,7 @@ import { writeFilesAndCommit } from './gitops';
 import { createVolumeSnapshot } from './kube';
 import { generateGatewayToken, renderGatewaySecret } from './tokens';
 import { encryptSecretYaml } from './sops';
-import { openclawImageValues } from './versions';
+import { appImageValues } from './versions';
 import { logger } from '../logger';
 
 function tenantDir(namespace: string): string {
@@ -16,7 +16,7 @@ interface RewriteOpts { replicas: number; restartToken?: string; message: string
 
 async function rewriteHelmRelease(instanceId: string, opts: RewriteOpts): Promise<void> {
   const inst = await prisma.serviceInstance.findUniqueOrThrow({ where: { id: instanceId } });
-  const image = await openclawImageValues(inst, opts.toLatest ?? false);
+  const image = await appImageValues(inst, opts.toLatest ?? false);
   const hr = renderHelmRelease({
     name: `${inst.username}-${inst.appSlug}`,
     namespace: inst.namespace,
@@ -95,7 +95,7 @@ export async function regenerateGatewayToken(instanceId: string): Promise<void> 
   await prisma.serviceInstance.update({ where: { id: instanceId }, data: { gatewayToken: token } });
   const dir = tenantDir(inst.namespace);
   const secret = await encryptSecretYaml(renderGatewaySecret(inst.namespace, token));
-  const image = await openclawImageValues(inst, false);
+  const image = await appImageValues(inst, false);
   const hr = renderHelmRelease({
     name: `${inst.username}-${inst.appSlug}`,
     namespace: inst.namespace,

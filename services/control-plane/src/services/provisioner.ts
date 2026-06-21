@@ -5,7 +5,7 @@ import { renderHelmRelease } from './helmrelease';
 import { writeFilesAndCommit, removePathAndCommit } from './gitops';
 import { ensureTenantRecord } from './dns';
 import { generateGatewayToken, renderGatewaySecret } from './tokens';
-import { openclawImageValues } from './versions';
+import { appImageValues } from './versions';
 import { encryptSecretYaml } from './sops';
 import { logger } from '../logger';
 
@@ -59,7 +59,7 @@ export async function provisionInstance(instanceId: string): Promise<void> {
     name: `${inst.username}-${inst.appSlug}`,
     namespace: inst.namespace,
     appChart: inst.appSlug,
-    values: { ...chartValues(inst, 1), ...(await openclawImageValues(inst, true)) },
+    values: { ...chartValues(inst, 1), ...(await appImageValues(inst, true)) },
   });
 
   const files: Record<string, string> = {};

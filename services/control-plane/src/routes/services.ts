@@ -7,7 +7,7 @@ import { enqueueJob } from '../services/jobQueue';
 import { scheduleDeprovision, suspendInstance, resumeInstance, restartInstance, reinstallInstance, regenerateGatewayToken } from '../services/lifecycle';
 import { deprovisionInstance } from '../services/provisioner';
 import { getDeploymentStatus, computeLiveStatus } from '../services/kubeStatus';
-import { tagOf, openclawLatest } from '../services/versions';
+import { tagOf, appLatest } from '../services/versions';
 
 export const servicesRouter = Router();
 
@@ -37,9 +37,8 @@ async function ownedInstance(req: unknown, id: string) {
 async function withLiveStatus<T extends { status: string; namespace: string; appSlug: string }>(i: T) {
   const st = await getDeploymentStatus(i.namespace, i.appSlug);
   const base = { ...instanceDto(i as never), status: computeLiveStatus(i.status, st) };
-  if (i.appSlug !== 'openclaw') return base;
   const currentVersion = tagOf(st.image) ?? null;
-  const latestVersion = (await openclawLatest()) ?? null;
+  const latestVersion = (await appLatest(i.appSlug)) ?? null;
   const updateAvailable = !!(currentVersion && latestVersion && currentVersion !== latestVersion);
   return { ...base, currentVersion, latestVersion, updateAvailable };
 }
