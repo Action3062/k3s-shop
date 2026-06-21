@@ -1,0 +1,33 @@
+# Pro-Tenant-Werte injiziert die Control-Plane über die HelmRelease.
+username: ""             # DNS-Label des Kunden
+appName: radarr          # App-Label in der Domain
+baseDomain: meinappnest.org  # Host = <username>.<appName>.<baseDomain>
+
+replicas: 1              # 0 = suspendiert
+
+image:
+  repository: ghcr.io/action3062/radarr
+  tag: "6.2.1.10461"     # Default; Control-Plane pinnt pro Tenant (Update beim Neustart)
+  pullPolicy: IfNotPresent
+
+# Radarr lauscht auf 7878, Config/DB in /config
+port: 7878
+timezone: Europe/Berlin
+
+storage:
+  size: 5Gi
+  storageClassName: hcloud-volumes
+
+resources:
+  requests: { cpu: 100m, memory: 256Mi }
+  limits:   { cpu: 750m, memory: 768Mi }
+
+ingress:
+  className: traefik
+  entrypoint: websecure
+  useDefaultWildcardCert: false   # nutzt das gespiegelte Wildcard-Secret pro App
+  certIssuer: ""
+
+# Lifecycle (von der Control-Plane gesetzt)
+restartToken: ""
+dataVersion: 1

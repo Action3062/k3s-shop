@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "radarr.fullname" . }}
+  labels:
+    app: radarr
+spec:
+  replicas: {{ .Values.replicas }}
+  strategy:
+    type: Recreate            # RWO-Volume -> kein RollingUpdate
+  selector:
+    matchLabels:
+      app: radarr
+  template:
+    metadata:
+      labels:
+        app: radarr
+      annotations:
+        meinappnest.io/restart-token: "{{ .Values.restartToken | default "" }}"
+    spec:
+      securityContext:
+        fsGroup: 568           # Image-User 'appnest' (uid/gid 568) -> Volume gruppen-schreibbar
+      containers:
+        - name: radarr
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.port | default 7878 }}
+          env:
+            - name: TZ
+              value: {{ .Values.timezone | default "Europe/Berlin" | quote }}
+          volumeMounts:
+            - name: data
+              mountPath: /config
+          resources: {{ toYaml .Values.resources | nindent 12 }}
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: {{ include "radarr.fullname" . }}-data-v{{ .Values.dataVersion | default 1 }}

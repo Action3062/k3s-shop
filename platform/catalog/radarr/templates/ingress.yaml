@@ -1,0 +1,31 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "radarr.fullname" . }}
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: {{ .Values.ingress.entrypoint }}
+    {{- if .Values.ingress.certIssuer }}
+    cert-manager.io/cluster-issuer: {{ .Values.ingress.certIssuer }}
+    {{- end }}
+spec:
+  ingressClassName: {{ .Values.ingress.className }}
+  rules:
+    - host: {{ include "radarr.host" . }}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ include "radarr.fullname" . }}
+                port:
+                  number: 80
+  {{- if .Values.ingress.certIssuer }}
+  tls:
+    - hosts: [ {{ include "radarr.host" . | quote }} ]
+      secretName: {{ include "radarr.fullname" . }}-tls
+  {{- else if not .Values.ingress.useDefaultWildcardCert }}
+  tls:
+    - hosts: [ {{ include "radarr.host" . | quote }} ]
+      secretName: wildcard-{{ .Values.appName }}-tls
+  {{- end }}
