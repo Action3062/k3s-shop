@@ -4,6 +4,9 @@ metadata:
   name: openclaw
   namespace: flux-system
 spec:
+  # Auto-Apply deaktiviert: Updates werden nur erkannt (ImagePolicy),
+  # eingespielt wird erst beim Kunden-Neustart ueber die Control-Plane.
+  suspend: true
   interval: 5m
   sourceRef:
     kind: GitRepository
