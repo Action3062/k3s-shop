@@ -1,0 +1,21 @@
+# Wildcard-Zertifikat für Radarr — *.radarr.meinappnest.org
+# Cloudflare DNS-01, via Reflector in tenant-*-radarr als wildcard-radarr-tls gespiegelt.
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: wildcard-radarr
+  namespace: cert-manager
+spec:
+  secretName: wildcard-radarr-tls
+  secretTemplate:
+    annotations:
+      reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
+      reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces: "tenant-.*-radarr"
+      reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
+      reflector.v1.k8s.emberstack.com/reflection-auto-namespaces: "tenant-.*-radarr"
+  issuerRef:
+    name: letsencrypt-cloudflare
+    kind: ClusterIssuer
+  commonName: "*.radarr.meinappnest.org"
+  dnsNames:
+    - "*.radarr.meinappnest.org"
