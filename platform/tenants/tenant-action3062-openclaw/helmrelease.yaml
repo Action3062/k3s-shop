@@ -11,6 +11,8 @@ spec:
   storageNamespace: tenant-action3062-openclaw
   install:
     createNamespace: false
+    remediation:
+      retries: 3
   upgrade:
     remediation:
       retries: 3

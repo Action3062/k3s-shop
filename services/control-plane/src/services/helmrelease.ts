@@ -17,7 +17,7 @@ export function renderHelmRelease(opts: HelmReleaseOpts): string {
       releaseName: opts.appChart,
       targetNamespace: opts.namespace,
       storageNamespace: opts.namespace,
-      install: { createNamespace: false },
+      install: { createNamespace: false, remediation: { retries: 3 } },
       upgrade: { remediation: { retries: 3 } },
       chart: {
         spec: {
