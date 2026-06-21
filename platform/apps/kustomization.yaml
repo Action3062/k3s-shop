@@ -8,3 +8,8 @@ resources:
   - seerr
   - vaultwarden
   - radarr
+  - sonarr
+  - bazarr
+  - notifiarr
+  - homepage
+  - uptime-kuma

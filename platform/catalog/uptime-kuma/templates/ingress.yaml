@@ -1,0 +1,31 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "uptime-kuma.fullname" . }}
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: {{ .Values.ingress.entrypoint }}
+    {{- if .Values.ingress.certIssuer }}
+    cert-manager.io/cluster-issuer: {{ .Values.ingress.certIssuer }}
+    {{- end }}
+spec:
+  ingressClassName: {{ .Values.ingress.className }}
+  rules:
+    - host: {{ include "uptime-kuma.host" . }}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ include "uptime-kuma.fullname" . }}
+                port:
+                  number: 80
+  {{- if .Values.ingress.certIssuer }}
+  tls:
+    - hosts: [ {{ include "uptime-kuma.host" . | quote }} ]
+      secretName: {{ include "uptime-kuma.fullname" . }}-tls
+  {{- else if not .Values.ingress.useDefaultWildcardCert }}
+  tls:
+    - hosts: [ {{ include "uptime-kuma.host" . | quote }} ]
+      secretName: wildcard-{{ .Values.appName }}-tls
+  {{- end }}

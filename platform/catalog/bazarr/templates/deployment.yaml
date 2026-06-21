@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "bazarr.fullname" . }}
+  labels:
+    app: bazarr
+spec:
+  replicas: {{ .Values.replicas }}
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: bazarr
+  template:
+    metadata:
+      labels:
+        app: bazarr
+      annotations:
+        meinappnest.io/restart-token: "{{ .Values.restartToken | default "" }}"
+    spec:
+      securityContext:
+        fsGroup: 568
+      containers:
+        - name: bazarr
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.port }}
+          env:
+            - name: TZ
+              value: {{ .Values.timezone | default "Europe/Berlin" | quote }}
+          volumeMounts:
+            - name: data
+              mountPath: /config
+          resources: {{ toYaml .Values.resources | nindent 12 }}
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: {{ include "bazarr.fullname" . }}-data-v{{ .Values.dataVersion | default 1 }}

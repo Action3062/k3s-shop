@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "notifiarr.fullname" . }}
+  labels:
+    app: notifiarr
+spec:
+  replicas: {{ .Values.replicas }}
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: notifiarr
+  template:
+    metadata:
+      labels:
+        app: notifiarr
+      annotations:
+        meinappnest.io/restart-token: "{{ .Values.restartToken | default "" }}"
+    spec:
+      imagePullSecrets:
+        - name: ghcr-pull
+      containers:
+        - name: notifiarr
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.port }}
+          env:
+            - name: TZ
+              value: {{ .Values.timezone | default "Europe/Berlin" | quote }}
+          volumeMounts:
+            - name: data
+              mountPath: /config
+          resources: {{ toYaml .Values.resources | nindent 12 }}
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: {{ include "notifiarr.fullname" . }}-data-v{{ .Values.dataVersion | default 1 }}

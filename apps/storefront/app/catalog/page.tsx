@@ -2,7 +2,7 @@ export const dynamic = "force-dynamic";
 import { getCatalog } from "@/lib/controlPlane";
 import { AppCard } from "@/components/AppCard";
 
-const AVAILABLE = new Set(["vaultwarden", "openclaw", "seerr", "radarr"]);
+const AVAILABLE = new Set(["vaultwarden", "openclaw", "seerr", "radarr", "sonarr", "bazarr", "notifiarr", "homepage", "uptime-kuma"]);
 
 export const metadata = { title: "Apps — MeinAppNest" };
 

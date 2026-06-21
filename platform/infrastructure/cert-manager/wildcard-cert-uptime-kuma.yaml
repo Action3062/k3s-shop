@@ -1,0 +1,19 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: wildcard-uptime-kuma
+  namespace: cert-manager
+spec:
+  secretName: wildcard-uptime-kuma-tls
+  secretTemplate:
+    annotations:
+      reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
+      reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces: "tenant-.*-uptime-kuma"
+      reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
+      reflector.v1.k8s.emberstack.com/reflection-auto-namespaces: "tenant-.*-uptime-kuma"
+  issuerRef:
+    name: letsencrypt-cloudflare
+    kind: ClusterIssuer
+  commonName: "*.uptime-kuma.meinappnest.org"
+  dnsNames:
+    - "*.uptime-kuma.meinappnest.org"

@@ -6,3 +6,8 @@ resources:
   - wildcard-cert-openclaw.yaml
   - wildcard-cert-radarr.yaml
   - wildcard-cert-seerr.yaml
+  - wildcard-cert-sonarr.yaml
+  - wildcard-cert-bazarr.yaml
+  - wildcard-cert-notifiarr.yaml
+  - wildcard-cert-homepage.yaml
+  - wildcard-cert-uptime-kuma.yaml

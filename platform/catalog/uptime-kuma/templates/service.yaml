@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "uptime-kuma.fullname" . }}
+spec:
+  selector:
+    app: uptime-kuma
+  ports:
+    - name: http
+      port: 80
+      targetPort: {{ .Values.port }}
+    - name: app
+      port: {{ .Values.port }}
+      targetPort: {{ .Values.port }}

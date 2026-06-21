@@ -1,0 +1,24 @@
+# Pro-Tenant-Werte injiziert die Control-Plane über die HelmRelease.
+username: ""
+appName: bazarr
+baseDomain: meinappnest.org
+replicas: 1
+image:
+  repository: ghcr.io/action3062/bazarr
+  tag: "1.5.6"        # Default; Control-Plane pinnt pro Tenant (Update beim Neustart)
+  pullPolicy: IfNotPresent
+port: 6767
+timezone: Europe/Berlin
+storage:
+  size: 5Gi
+  storageClassName: hcloud-volumes
+resources:
+  requests: { cpu: 100m, memory: 192Mi }
+  limits:   { cpu: 750m, memory: 768Mi }
+ingress:
+  className: traefik
+  entrypoint: websecure
+  useDefaultWildcardCert: false
+  certIssuer: ""
+restartToken: ""
+dataVersion: 1
