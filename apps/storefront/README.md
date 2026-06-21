@@ -2,9 +2,9 @@
 
 Next.js 14 (App Router), TypeScript, Tailwind, Dark Mode.
 
-**Status:** Phase 0 — Platzhalter. Implementierung in Phase 3.
+**Status:** live — Storefront, Dashboard, Auth, Katalog und Billing implementiert.
 
-## Seiten (geplant)
+## Seiten (live)
 
 Landing/Hero · Katalog · App-Detail · Pricing · Checkout · Login/Signup · Dashboard „Meine Dienste" · Platzhalter Impressum/AGB/Datenschutz.
 

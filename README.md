@@ -2,7 +2,7 @@
 
 > Self-service Multi-Tenant-Hosting-Plattform (ElfHosted-Stil) auf einem bestehenden **k3s**-HA-Cluster bei Hetzner. Kunden abonnieren im Store eine self-hosted App und erhalten wenige Minuten später eine laufende, isolierte Instanz unter `https://<username>.<appname>.meinappnest.org` — inklusive eigener Subdomain und HTTPS.
 
-*Arbeitsname — gern umbenennen.* Status: **Phase 0 (Fundament)**. Siehe [Roadmap](#roadmap).
+*Arbeitsname — gern umbenennen.* Status: **live in Produktion** (Phasen 1–4 abgeschlossen, Phase 5 laufend). Siehe [Roadmap](#roadmap).
 
 ---
 
@@ -93,11 +93,11 @@ Ziel: Eine neue App ist „nur Daten" — kein Sonderfall im Code.
 ## Roadmap
 
 - [x] **Phase 0** — Fundament: Repo-Scaffolding + ADR (GitOps/CNI/Backend/Repo/API/Datenmodell)
-- [ ] **Phase 1** — Infra: Wildcard-DNS + Wildcard-TLS (Cloudflare DNS-01), Flux, Tenant-Namespace-Template, Vaultwarden-Chart, 1 Test-Tenant via GitOps
-- [ ] **Phase 2** — Control-Plane: Prisma-Migrations, Provisioning-Engine, Basis-API
-- [ ] **Phase 3** — Storefront + Dashboard: Design + higgsfield-Assets + Auth
-- [ ] **Phase 4** — Billing: Stripe Checkout + Webhooks → Provisioning/Lifecycle
-- [ ] **Phase 5** — Abschluss: E2E-Test, Security-Review, Doku
+- [x] **Phase 1** — Infra: Wildcard-DNS + Wildcard-TLS (Cloudflare DNS-01), Flux, Tenant-Namespace-Template, Vaultwarden-Chart, 1 Test-Tenant via GitOps
+- [x] **Phase 2** — Control-Plane: Prisma-Migrations, Provisioning-Engine, Basis-API
+- [x] **Phase 3** — Storefront + Dashboard: Design + higgsfield-Assets + Auth
+- [x] **Phase 4** — Billing: Stripe Checkout + Webhooks → Provisioning/Lifecycle
+- [ ] **Phase 5** — Abschluss: E2E-Test, Security-Review (✓ 2026-06), Doku-Sync (laufend)
 
 ## Leitplanken
 

@@ -2,7 +2,7 @@
 
 Node.js/TypeScript-Dienst: Provisioning-Engine, Lifecycle, REST-API (siehe [`../../docs/api-contract.md`](../../docs/api-contract.md)) und Stripe-Webhooks.
 
-**Status:** Phase 0 — nur Datenmodell (`prisma/schema.prisma`). Implementierung folgt in Phase 2/4.
+**Status:** live — Provisioning-Engine, Lifecycle, REST-API und Stripe-Webhooks implementiert (siehe `src/`).
 
 ## Verantwortlichkeiten
 

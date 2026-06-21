@@ -1,6 +1,6 @@
 # API-Vertrag — Storefront (Next.js) ↔ Control-Plane
 
-Status: **Entwurf (Phase 0)**. Base URL der Control-Plane: `CONTROL_PLANE_URL` (clusterintern).
+Status: **live (implementiert)**. Base URL der Control-Plane: `CONTROL_PLANE_URL` (clusterintern).
 
 ## Konventionen
 
