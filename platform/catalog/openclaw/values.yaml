@@ -5,7 +5,7 @@ baseDomain: meinappnest.org
 replicas: 1 # 0 = suspendiert
 image:
   repository: ghcr.io/action3062/openclaw # selbst-gebautes, de-brandetes Image (MeinAppNest-Fork)
-  tag: "v2026.6.9" # {"$imagepolicy": "flux-system:openclaw:tag"}
+  tag: "v2026.6.9"            # Default fuer Neu-Provisionierung; Control-Plane pinnt pro Tenant
   pullPolicy: IfNotPresent
 # OpenClaw-Gateway-Port (Control-UI + Gateway-API)
 port: 18789

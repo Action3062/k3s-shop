@@ -9,4 +9,5 @@ export interface ServiceInstance {
   id: string; appSlug: string; name: string; status: string; url: string;
   subdomain: string; namespace: string; storageGi: number; createdAt: string;
   suspendedAt?: string | null; deprovisionAfter?: string | null; lastBackupAt?: string | null;
+  currentVersion?: string | null; latestVersion?: string | null; updateAvailable?: boolean;
 }

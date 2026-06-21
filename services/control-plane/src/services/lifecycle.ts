@@ -5,16 +5,18 @@ import { writeFilesAndCommit } from './gitops';
 import { createVolumeSnapshot } from './kube';
 import { generateGatewayToken, renderGatewaySecret } from './tokens';
 import { encryptSecretYaml } from './sops';
+import { openclawImageValues } from './versions';
 import { logger } from '../logger';
 
 function tenantDir(namespace: string): string {
   return `${config.GITOPS_TENANTS_PATH}/${namespace}`;
 }
 
-interface RewriteOpts { replicas: number; restartToken?: string; message: string; }
+interface RewriteOpts { replicas: number; restartToken?: string; message: string; toLatest?: boolean; }
 
 async function rewriteHelmRelease(instanceId: string, opts: RewriteOpts): Promise<void> {
   const inst = await prisma.serviceInstance.findUniqueOrThrow({ where: { id: instanceId } });
+  const image = await openclawImageValues(inst, opts.toLatest ?? false);
   const hr = renderHelmRelease({
     name: `${inst.username}-${inst.appSlug}`,
     namespace: inst.namespace,
@@ -27,6 +29,7 @@ async function rewriteHelmRelease(instanceId: string, opts: RewriteOpts): Promis
       storage: { size: `${inst.storageGi}Gi` },
       dataVersion: inst.dataVersion,
       restartToken: opts.restartToken ?? '',
+      ...image,
     },
   });
   await writeFilesAndCommit(
@@ -49,7 +52,7 @@ export async function resumeInstance(instanceId: string): Promise<void> {
 
 /** Restart: forciert via geänderten restart-token einen Pod-Neustart (Daten bleiben). */
 export async function restartInstance(instanceId: string): Promise<void> {
-  await rewriteHelmRelease(instanceId, { replicas: 1, restartToken: String(Date.now()), message: 'restart' });
+  await rewriteHelmRelease(instanceId, { replicas: 1, restartToken: String(Date.now()), message: 'restart', toLatest: true });
   await prisma.serviceInstance.update({ where: { id: instanceId }, data: { status: 'RUNNING', suspendedAt: null } });
   logger.info({ instanceId }, 'instance restarted');
 }
@@ -92,6 +95,7 @@ export async function regenerateGatewayToken(instanceId: string): Promise<void> 
   await prisma.serviceInstance.update({ where: { id: instanceId }, data: { gatewayToken: token } });
   const dir = tenantDir(inst.namespace);
   const secret = await encryptSecretYaml(renderGatewaySecret(inst.namespace, token));
+  const image = await openclawImageValues(inst, false);
   const hr = renderHelmRelease({
     name: `${inst.username}-${inst.appSlug}`,
     namespace: inst.namespace,
@@ -100,6 +104,7 @@ export async function regenerateGatewayToken(instanceId: string): Promise<void> 
       username: inst.username, appName: inst.appSlug, baseDomain: config.APPS_BASE_DOMAIN,
       replicas: 1, storage: { size: `${inst.storageGi}Gi` }, dataVersion: inst.dataVersion,
       restartToken: String(Date.now()),
+      ...image,
     },
   });
   await writeFilesAndCommit({ [`${dir}/secret.sops.yaml`]: secret, [`${dir}/helmrelease.yaml`]: hr }, `regenerate-token: ${inst.namespace}`);

@@ -68,6 +68,11 @@ export default async function ServiceDetail({ params, searchParams }: {
       <div className="card mt-3.5">
         <h2 className="text-[15px] font-semibold mb-1">Verwalten</h2>
         <p className="text-muted text-[13px] mb-4">Starte, pausiere oder starte deinen Dienst neu.</p>
+        {s.updateAvailable && (
+          <div className="mb-4 text-sm rounded-xl px-4 py-3 border border-line bg-surface/40 text-ink">
+            <b>Update verfügbar:</b> Version <span className="mono text-accent-ink">{s.latestVersion}</span> (aktuell <span className="mono">{s.currentVersion}</span>). Beim nächsten <b>Neu starten</b> wird sie automatisch eingespielt.
+          </div>
+        )}
         <div className="flex flex-wrap gap-2">
           {running ? <Act action={stopService} id={s.id} back={back} label="Pausieren" /> : <Act action={startService} id={s.id} back={back} label="Starten" />}
           <Act action={restartService} id={s.id} back={back} label="Neu starten" />
