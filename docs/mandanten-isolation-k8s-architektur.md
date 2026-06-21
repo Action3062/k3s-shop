@@ -1,5 +1,7 @@
 # Mandanten-Isolation auf Kubernetes / k3s
 
+> **Hinweis (Label-Mapping):** Dieses Dokument nutzt zur Veranschaulichung die Label-Keys `customer` / `app-namespace` und das Namensschema `<kunde>-<app>`. Die **produktive Implementierung** verwendet `dynstore.io/tenant` / `dynstore.io/app` und Namespaces `tenant-<kunde>-<app>` (siehe `platform/tenant-template/`). Wer die YAML-Beispiele übernimmt, muss die Keys entsprechend ersetzen.
+
 **Namespace-pro-App-pro-Kunde mit plattformverwalteten Labels, Default-Deny und kundengebundenen NetworkPolicies**
 
 Stand: 2026-06-20 · Geltungsbereich: k3s-Cluster (Hetzner), Multi-Tenant-App-Hosting (z. B. Sonarr / Radarr / Jellyseerr)

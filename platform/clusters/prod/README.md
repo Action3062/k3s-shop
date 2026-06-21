@@ -9,9 +9,9 @@ Einstiegspunkt für Flux. `flux bootstrap` erzeugt hier zusätzlich `flux-system
 export KUBECONFIG=/home/admin/k3s-hz_kubeconfig.yaml
 export GITHUB_TOKEN=...        # PAT mit repo-Scope
 flux bootstrap github \
-  --owner=<ORG> --repository=dynstore \
-  --branch=main --path=platform/clusters/prod \
-  --personal
+  --owner=Action3062 --repository=k3s-shop \
+  --branch=main --path=platform/clusters/prod
+# Org-Repo (nicht --personal); GITHUB_TOKEN = PAT mit repo-Scope (oben gesetzt).
 ```
 
 Danach SOPS-Age-Secret im Cluster anlegen (für entschlüsselte HelmReleases/Secrets):
