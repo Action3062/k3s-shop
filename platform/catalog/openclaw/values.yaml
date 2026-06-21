@@ -1,48 +1,38 @@
 # Pro-Tenant-Werte injiziert die Control-Plane über die HelmRelease.
-username: ""              # DNS-Label des Kunden
-appName: openclaw        # App-Label in der Domain
+username: "" # DNS-Label des Kunden
+appName: openclaw # App-Label in der Domain
 baseDomain: meinappnest.org
-
-replicas: 1              # 0 = suspendiert
-
+replicas: 1 # 0 = suspendiert
 image:
-  repository: ghcr.io/action3062/openclaw   # selbst-gebautes, de-brandetes Image (MeinAppNest-Fork)
-  tag: "v2026.6.8" # {"$imagepolicy": "flux-system:openclaw:tag"}
+  repository: ghcr.io/action3062/openclaw # selbst-gebautes, de-brandetes Image (MeinAppNest-Fork)
+  tag: "v2026.6.9" # {"$imagepolicy": "flux-system:openclaw:tag"}
   pullPolicy: IfNotPresent
-
 # OpenClaw-Gateway-Port (Control-UI + Gateway-API)
 port: 18789
 # Bind-Modus: lan = an der Pod-IP lauschen (vom Service erreichbar). Das Image
 # Das Image erzwingt Auth bei Nicht-loopback-Bind; wir liefern OPENCLAW_GATEWAY_TOKEN.
 gatewayBind: lan
-
 storage:
-  size: 10Gi             # Hetzner-Volumes Minimum = 10Gi
+  size: 10Gi # Hetzner-Volumes Minimum = 10Gi
   storageClassName: hcloud-volumes
-
 resources:
-  requests: { cpu: 250m, memory: 512Mi }
-  limits:   { cpu: "1",  memory: 2Gi }
-
+  requests: {cpu: 250m, memory: 512Mi}
+  limits: {cpu: "1", memory: 2Gi}
 ingress:
   className: traefik
   entrypoint: websecure
-  useDefaultWildcardCert: false   # nutzt das gespiegelte Wildcard-Secret pro App
-  certIssuer: ""                  # leer => kein HTTP-01 pro Host
-
+  useDefaultWildcardCert: false # nutzt das gespiegelte Wildcard-Secret pro App
+  certIssuer: "" # leer => kein HTTP-01 pro Host
 # Gateway-Token: Secret wird von der Control-Plane out-of-band verwaltet (NICHT in Git).
 # Die neue Image (App) authentifiziert per Token (env OPENCLAW_GATEWAY_TOKEN / --token).
 gatewayTokenSecretName: openclaw-secrets
 gatewayTokenSecretKey: OPENCLAW_GATEWAY_TOKEN
-
 # Lifecycle (Control-Plane)
-restartToken: ""         # Änderung erzwingt Pod-Neustart
-dataVersion: 1           # Hochzählen = frisches Volume (Neuinstallation)
-
+restartToken: "" # Änderung erzwingt Pod-Neustart
+dataVersion: 1 # Hochzählen = frisches Volume (Neuinstallation)
 gate:
   enabled: true
   verifyUrl: http://storefront.storefront.svc.cluster.local/api/gate/verify
-
 # Eingebaute Web-Shell (ttyd) der neuen Image — ersetzt den früheren webcli-Sidecar.
 # Läuft im OpenClaw-Container selbst (für `openclaw setup` etc.), Auth = Gateway-Zugang.
 webcli:
