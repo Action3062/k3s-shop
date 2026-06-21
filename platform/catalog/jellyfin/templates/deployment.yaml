@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "jellyfin.fullname" . }}
+  labels:
+    app: jellyfin
+spec:
+  replicas: {{ .Values.replicas }}
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: jellyfin
+  template:
+    metadata:
+      labels:
+        app: jellyfin
+      annotations:
+        meinappnest.io/restart-token: "{{ .Values.restartToken | default "" }}"
+    spec:
+      securityContext:
+        fsGroup: 568
+      containers:
+        - name: jellyfin
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.port }}
+          env:
+            - name: TZ
+              value: {{ .Values.timezone | default "Europe/Berlin" | quote }}
+            - name: JELLYFIN_PublishedServerUrl
+              value: "https://{{ include "jellyfin.host" . }}"
+            - name: JELLYFIN_ALLOW_4K
+              value: {{ .Values.allow4k | default "true" | quote }}
+            - name: JELLYFIN_MAX_HD_TRANSCODES
+              value: {{ .Values.maxHdTranscodes | default "" | quote }}
+            - name: JELLYFIN_MAX_4K_TRANSCODES
+              value: {{ .Values.max4kTranscodes | default "" | quote }}
+            - name: TRANSCODE_KILLER_ENABLED
+              value: {{ .Values.transcodeKiller | default "true" | quote }}
+          volumeMounts:
+            - name: data
+              mountPath: /config
+          resources: {{ toYaml .Values.resources | nindent 12 }}
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: {{ include "jellyfin.fullname" . }}-data-v{{ .Values.dataVersion | default 1 }}

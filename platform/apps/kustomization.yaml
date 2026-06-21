@@ -13,3 +13,4 @@ resources:
   - notifiarr
   - homepage
   - uptime-kuma
+  - jellyfin

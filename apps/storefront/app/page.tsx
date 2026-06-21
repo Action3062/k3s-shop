@@ -4,10 +4,9 @@ import { getCatalog } from "@/lib/controlPlane";
 import { AppCard } from "@/components/AppCard";
 import type { CatalogApp } from "@/lib/types";
 
-const AVAILABLE = new Set(["vaultwarden", "openclaw", "seerr", "radarr", "sonarr", "bazarr", "notifiarr", "homepage", "uptime-kuma"]);
+const AVAILABLE = new Set(["vaultwarden", "openclaw", "seerr", "radarr", "sonarr", "bazarr", "notifiarr", "homepage", "uptime-kuma", "jellyfin"]);
 
 const UPCOMING: CatalogApp[] = [
-  { slug: "jellyfin", name: "Jellyfin", category: "Media", description: "Streame Filme, Serien und Musik von überall – werbefrei.", plans: [{ id: "x", name: "Standard", priceCents: 700, interval: "month", storageGi: 10 }] },
   { slug: "nextcloud", name: "Nextcloud", category: "Cloud & Dateien", description: "Deine eigene Cloud für Dateien, Kalender und Kontakte.", plans: [{ id: "x", name: "Standard", priceCents: 900, interval: "month", storageGi: 50 }] },
   { slug: "n8n", name: "n8n", category: "Automatisierung", description: "Verbinde deine Tools und automatisiere Workflows – visuell.", plans: [{ id: "x", name: "Standard", priceCents: 800, interval: "month", storageGi: 5 }] },
   { slug: "uptime-kuma", name: "Uptime Kuma", category: "Monitoring", description: "Behalte deine Dienste im Blick, Alerts bei Ausfällen.", plans: [{ id: "x", name: "Standard", priceCents: 400, interval: "month", storageGi: 2 }] },

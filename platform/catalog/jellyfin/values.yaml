@@ -1,0 +1,29 @@
+# Pro-Tenant-Werte injiziert die Control-Plane über die HelmRelease.
+username: ""
+appName: jellyfin
+baseDomain: meinappnest.org
+replicas: 1
+image:
+  repository: ghcr.io/action3062/jellyfin
+  tag: "10.11.11"        # Default; Control-Plane pinnt pro Tenant (Update beim Neustart)
+  pullPolicy: IfNotPresent
+port: 8096
+timezone: Europe/Berlin
+# Transcode-Killer / Paket-Limits (leer = unbegrenzt)
+allow4k: "true"
+maxHdTranscodes: ""
+max4kTranscodes: ""
+transcodeKiller: "true"
+storage:
+  size: 10Gi
+  storageClassName: hcloud-volumes
+resources:
+  requests: { cpu: 200m, memory: 512Mi }
+  limits:   { cpu: "2", memory: 2Gi }
+ingress:
+  className: traefik
+  entrypoint: websecure
+  useDefaultWildcardCert: false
+  certIssuer: ""
+restartToken: ""
+dataVersion: 1

@@ -11,3 +11,4 @@ resources:
   - wildcard-cert-notifiarr.yaml
   - wildcard-cert-homepage.yaml
   - wildcard-cert-uptime-kuma.yaml
+  - wildcard-cert-jellyfin.yaml
