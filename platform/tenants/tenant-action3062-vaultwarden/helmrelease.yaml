@@ -11,6 +11,8 @@ spec:
   storageNamespace: tenant-action3062-vaultwarden
   install:
     createNamespace: false
+    remediation:
+      retries: 3
   upgrade:
     remediation:
       retries: 3
@@ -25,8 +27,10 @@ spec:
     username: action3062
     appName: vaultwarden
     baseDomain: meinappnest.org
-    replicas: 1
+    replicas: 0
     storage:
       size: 5Gi
     dataVersion: 1
     restartToken: ""
+    image:
+      tag: 1.36.0
