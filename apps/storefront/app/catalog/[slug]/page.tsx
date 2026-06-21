@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { getCatalog } from "@/lib/controlPlane";
 import { checkout } from "@/app/actions";
 
-const AVAILABLE = new Set(["vaultwarden", "openclaw", "seerr"]);
+const AVAILABLE = new Set(["vaultwarden", "openclaw", "seerr", "radarr"]);
 const HUE: Record<string, string> = { vaultwarden: "#34D399", nextcloud: "#38BDF8", jellyfin: "#A78BFA", n8n: "#FBBF24", "uptime-kuma": "#F472B6", homepage: "#22D3EE" };
 
 export default async function AppDetail({ params }: { params: { slug: string } }) {
