@@ -1,0 +1,69 @@
+# ---------------------------------------------------------------------------
+# dynstore-namespace NetworkPolicies.
+#
+# Ingress: default-deny + targeted allows. Egress: not restricted (left open
+# so control-plane can reach Stripe/GHCR/git, and pods can resolve DNS without
+# special rules). A future hardening pass can add explicit egress controls.
+# ---------------------------------------------------------------------------
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny-ingress
+  namespace: dynstore
+spec:
+  podSelector: {}
+  policyTypes: ["Ingress"]
+---
+# Public ingress into control-plane comes only from the traefik proxy.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-traefik-to-control-plane
+  namespace: dynstore
+spec:
+  podSelector:
+    matchLabels: { app: control-plane }
+  policyTypes: ["Ingress"]
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels: { kubernetes.io/metadata.name: traefik }
+      ports:
+        - { port: 8080, protocol: TCP }
+---
+# Internal traffic from storefront namespace to control-plane.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-storefront-to-control-plane
+  namespace: dynstore
+spec:
+  podSelector:
+    matchLabels: { app: control-plane }
+  policyTypes: ["Ingress"]
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels: { kubernetes.io/metadata.name: storefront }
+      ports:
+        - { port: 8080, protocol: TCP }
+---
+# Postgres accepts connections only from control-plane (same ns) and from the
+# storefront namespace. Everything else is blocked by default-deny-ingress.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-to-postgres
+  namespace: dynstore
+spec:
+  podSelector:
+    matchLabels: { app: postgres }
+  policyTypes: ["Ingress"]
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels: { app: control-plane }
+        - namespaceSelector:
+            matchLabels: { kubernetes.io/metadata.name: storefront }
+      ports:
+        - { port: 5432, protocol: TCP }

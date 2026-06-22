@@ -5,3 +5,4 @@ resources:
   - imagerepository.yaml
   - imagepolicy.yaml
   - imageupdateautomation.yaml
+  - networkpolicy.yaml

@@ -1,0 +1,29 @@
+# ---------------------------------------------------------------------------
+# storefront-namespace NetworkPolicies. Ingress only; egress left open so the
+# storefront can reach the control-plane (dynstore ns), postgres (dynstore ns),
+# DNS, and external next-auth / payment endpoints.
+# ---------------------------------------------------------------------------
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny-ingress
+  namespace: storefront
+spec:
+  podSelector: {}
+  policyTypes: ["Ingress"]
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-traefik-to-storefront
+  namespace: storefront
+spec:
+  podSelector:
+    matchLabels: { app: storefront }
+  policyTypes: ["Ingress"]
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels: { kubernetes.io/metadata.name: traefik }
+      ports:
+        - { port: 3000, protocol: TCP }
