@@ -14,9 +14,43 @@ spec:
       labels: { app: postgres }
     spec:
       automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 70           # postgres user in alpine
+        runAsGroup: 70
+        fsGroup: 70
+        seccompProfile:
+          type: RuntimeDefault
+      initContainers:
+        # On the first hardened roll, the on-disk data dir is still owned root:root.
+        # postgres (uid 70) cannot write there until ownership is fixed. This init
+        # runs as root and chowns the whole tree; subsequent restarts are no-ops.
+        - name: chown-data
+          image: postgres:16-alpine
+          securityContext:
+            runAsNonRoot: false
+            runAsUser: 0
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+              add: ["CHOWN", "FOWNER", "DAC_OVERRIDE"]
+          command:
+            - sh
+            - -c
+            - |
+              set -eu
+              chown -R 70:70 /var/lib/postgresql/data
+              chmod 700 /var/lib/postgresql/data/pgdata 2>/dev/null || true
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/postgresql/data
       containers:
         - name: postgres
           image: postgres:16-alpine
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
           ports:
             - containerPort: 5432
           envFrom:
