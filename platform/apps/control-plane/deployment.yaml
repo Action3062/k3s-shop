@@ -13,10 +13,23 @@ spec:
       labels: {app: control-plane}
     spec:
       serviceAccountName: control-plane
+      automountServiceAccountToken: true
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
       containers:
         - name: control-plane
           image: ghcr.io/action3062/dynstore-control-plane:20260622180407 # {"$imagepolicy": "flux-system:control-plane"}
           imagePullPolicy: IfNotPresent
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+            readOnlyRootFilesystem: false  # simple-git/sops write to /tmp/dynstore-gitops
           ports:
             - containerPort: 8080
           env:

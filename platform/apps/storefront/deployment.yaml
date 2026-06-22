@@ -12,10 +12,23 @@ spec:
     metadata:
       labels: {app: storefront}
     spec:
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
       containers:
         - name: storefront
           image: ghcr.io/action3062/dynstore-storefront:20260622200736 # {"$imagepolicy": "flux-system:storefront"}
           imagePullPolicy: IfNotPresent
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+            readOnlyRootFilesystem: false  # next.js writes to .next/cache; keep flexible for now
           ports:
             - containerPort: 3000
           env:
