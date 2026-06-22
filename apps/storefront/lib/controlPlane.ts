@@ -1,14 +1,26 @@
 import type { CatalogApp, ServiceInstance } from "./types";
+import { signCustomerAssertion } from "./customerAssert";
 
 const BASE = process.env.CONTROL_PLANE_URL ?? "";
 const TOKEN = process.env.CP_SERVICE_TOKEN ?? "";
+const ADMIN_TOKEN = process.env.CP_ADMIN_TOKEN ?? "";
 
-async function cp<T>(path: string, init?: RequestInit & { customerId?: string }): Promise<T> {
+type CpInit = RequestInit & { customerId?: string; admin?: boolean };
+
+async function cp<T>(path: string, init?: CpInit): Promise<T> {
   const headers: Record<string, string> = {
     "content-type": "application/json",
     authorization: `Bearer ${TOKEN}`,
-    ...(init?.customerId ? { "x-customer-id": init.customerId } : {}),
   };
+  if (init?.customerId) {
+    // Stufe A: signierte Assertion zusaetzlich zum Legacy-Header senden.
+    headers["x-customer-id"] = init.customerId;
+    const assert = signCustomerAssertion(init.customerId);
+    if (assert) headers["x-customer-assert"] = assert;
+  }
+  if (init?.admin && ADMIN_TOKEN) {
+    headers["x-admin-token"] = ADMIN_TOKEN;
+  }
   const res = await fetch(`${BASE}${path}`, { ...init, headers, cache: "no-store" });
   if (!res.ok) throw new Error(`control-plane ${path} -> ${res.status}`);
   return res.json() as Promise<T>;
@@ -77,13 +89,13 @@ export type AdminServiceInstance = ServiceInstance & {
 
 export async function adminListServices(): Promise<AdminServiceInstance[]> {
   if (!BASE) return [];
-  try { return await cp<AdminServiceInstance[]>("/v1/admin/services"); }
+  try { return await cp<AdminServiceInstance[]>("/v1/admin/services", { admin: true }); }
   catch { return []; }
 }
 
 export async function adminDeprovision(id: string): Promise<boolean> {
   if (!BASE) return false;
-  try { await cp(`/v1/admin/services/${id}`, { method: "DELETE" }); return true; }
+  try { await cp(`/v1/admin/services/${id}`, { method: "DELETE", admin: true }); return true; }
   catch { return false; }
 }
 
@@ -93,7 +105,7 @@ export async function adminServiceAction(
 ): Promise<boolean> {
   if (!BASE) return false;
   try {
-    await cp(`/v1/admin/services/${id}/${action}`, { method: "POST" });
+    await cp(`/v1/admin/services/${id}/${action}`, { method: "POST", admin: true });
     return true;
   } catch {
     return false;
@@ -115,7 +127,7 @@ export async function adminClusterSummary(): Promise<ClusterSummary> {
     namespaces: 0,
   };
   if (!BASE) return empty;
-  try { return await cp<ClusterSummary>("/v1/admin/cluster"); }
+  try { return await cp<ClusterSummary>("/v1/admin/cluster", { admin: true }); }
   catch { return empty; }
 }
 

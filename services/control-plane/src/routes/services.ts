@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { prisma } from '../db';
 import { ApiError, errorBody } from '../lib/errors';
 import { asyncHandler } from '../lib/asyncHandler';
-import { customerContext } from '../middleware/auth';
+import { customerAssertion, adminAuth } from '../middleware/auth';
 import { enqueueJob } from '../services/jobQueue';
 import { scheduleDeprovision, suspendInstance, resumeInstance, restartInstance, reinstallInstance, regenerateGatewayToken } from '../services/lifecycle';
 import { deprovisionInstance } from '../services/provisioner';
@@ -44,60 +44,60 @@ async function withLiveStatus<T extends { status: string; namespace: string; app
 }
 
 // ---- customer-facing ----
-servicesRouter.get('/me/services', customerContext, asyncHandler(async (req, res) => {
+servicesRouter.get('/me/services', customerAssertion, asyncHandler(async (req, res) => {
   const customerId = (req as { customerId?: string }).customerId!;
   const items = await prisma.serviceInstance.findMany({ where: { subscription: { customerId } }, orderBy: { createdAt: 'desc' } });
   res.json(await Promise.all(items.map(withLiveStatus)));
 }));
 
-servicesRouter.get('/services/:id', customerContext, asyncHandler(async (req, res) => {
+servicesRouter.get('/services/:id', customerAssertion, asyncHandler(async (req, res) => {
   const inst = await ownedInstance(req, req.params.id);
   res.json(await withLiveStatus(inst));
 }));
 
-servicesRouter.post('/services/:id/start', customerContext, asyncHandler(async (req, res) => {
+servicesRouter.post('/services/:id/start', customerAssertion, asyncHandler(async (req, res) => {
   const inst = await ownedInstance(req, req.params.id);
   await resumeInstance(inst.id);
   res.status(202).json({ ok: true, action: 'start' });
 }));
 
-servicesRouter.post('/services/:id/stop', customerContext, asyncHandler(async (req, res) => {
+servicesRouter.post('/services/:id/stop', customerAssertion, asyncHandler(async (req, res) => {
   const inst = await ownedInstance(req, req.params.id);
   await suspendInstance(inst.id);
   res.status(202).json({ ok: true, action: 'stop' });
 }));
 
-servicesRouter.post('/services/:id/restart', customerContext, asyncHandler(async (req, res) => {
+servicesRouter.post('/services/:id/restart', customerAssertion, asyncHandler(async (req, res) => {
   const inst = await ownedInstance(req, req.params.id);
   await restartInstance(inst.id);
   res.status(202).json({ ok: true, action: 'restart' });
 }));
 
-servicesRouter.post('/services/:id/reinstall', customerContext, asyncHandler(async (req, res) => {
+servicesRouter.post('/services/:id/reinstall', customerAssertion, asyncHandler(async (req, res) => {
   const inst = await ownedInstance(req, req.params.id);
   await reinstallInstance(inst.id);
   res.status(202).json({ ok: true, action: 'reinstall' });
 }));
 
-servicesRouter.get('/services/:id/token', customerContext, asyncHandler(async (req, res) => {
+servicesRouter.get('/services/:id/token', customerAssertion, asyncHandler(async (req, res) => {
   const inst = await ownedInstance(req, req.params.id);
   res.json({ token: inst.gatewayToken ?? null });
 }));
 
-servicesRouter.post('/services/:id/regenerate-token', customerContext, asyncHandler(async (req, res) => {
+servicesRouter.post('/services/:id/regenerate-token', customerAssertion, asyncHandler(async (req, res) => {
   const inst = await ownedInstance(req, req.params.id);
   await regenerateGatewayToken(inst.id);
   res.status(202).json({ ok: true, action: 'regenerate-token' });
 }));
 
-servicesRouter.delete('/services/:id', customerContext, asyncHandler(async (req, res) => {
+servicesRouter.delete('/services/:id', customerAssertion, asyncHandler(async (req, res) => {
   const inst = await ownedInstance(req, req.params.id);
   const after = await scheduleDeprovision(inst.id);
   res.status(202).json({ scheduled: true, deprovisionAfter: after });
 }));
 
-// ---- admin (Router ist bereits hinter serviceAuth; KEIN customerContext) ----
-servicesRouter.get('/admin/services', asyncHandler(async (_req, res) => {
+// ---- admin (Router ist bereits hinter serviceAuth; KEIN customerAssertion) ----
+servicesRouter.get('/admin/services', adminAuth, asyncHandler(async (_req, res) => {
   const items = await prisma.serviceInstance.findMany({
     orderBy: { createdAt: 'desc' },
     include: { subscription: { include: { customer: { include: { user: true } } } } },
@@ -107,7 +107,7 @@ servicesRouter.get('/admin/services', asyncHandler(async (_req, res) => {
 
 // Loescht einen Server exakt wie das Abo-Ende: Subscription -> CANCELED, dann deprovisionInstance
 // (entfernt das Git-Tenant-Verzeichnis -> Flux pruned Namespace, PVC und alle Workloads).
-servicesRouter.delete('/admin/services/:id', asyncHandler(async (req, res) => {
+servicesRouter.delete('/admin/services/:id', adminAuth, asyncHandler(async (req, res) => {
   const inst = await prisma.serviceInstance.findUnique({ where: { id: req.params.id } });
   if (!inst) return res.status(404).json(errorBody('not_found', 'service not found'));
   await prisma.subscription.update({ where: { id: inst.subscriptionId }, data: { status: 'CANCELED' } }).catch(() => null);
@@ -116,14 +116,14 @@ servicesRouter.delete('/admin/services/:id', asyncHandler(async (req, res) => {
 }));
 
 // ---- internal / admin ----
-servicesRouter.post('/services/:id/backup', asyncHandler(async (req, res) => {
+servicesRouter.post('/services/:id/backup', adminAuth, asyncHandler(async (req, res) => {
   const inst = await prisma.serviceInstance.findUnique({ where: { id: req.params.id } });
   if (!inst) return res.status(404).json(errorBody('not_found', 'service not found'));
   await enqueueJob(req.params.id, 'BACKUP', `manual-${Date.now()}`);
   res.status(202).json({ enqueued: true });
 }));
 
-// ---- admin lifecycle (kundenuebergreifend; KEIN customerContext, nur serviceAuth) ----
+// ---- admin lifecycle (kundenuebergreifend; KEIN customerAssertion, nur serviceAuth) ----
 const ADMIN_LIFECYCLE: Record<string, (id: string) => Promise<unknown>> = {
   start: resumeInstance,
   stop: suspendInstance,
@@ -132,7 +132,7 @@ const ADMIN_LIFECYCLE: Record<string, (id: string) => Promise<unknown>> = {
   'regenerate-token': regenerateGatewayToken,
 };
 
-servicesRouter.post('/admin/services/:id/:action', asyncHandler(async (req, res) => {
+servicesRouter.post('/admin/services/:id/:action', adminAuth, asyncHandler(async (req, res) => {
   const { id, action } = req.params;
   const inst = await prisma.serviceInstance.findUnique({ where: { id } });
   if (!inst) return res.status(404).json(errorBody('not_found', 'service not found'));
@@ -147,6 +147,6 @@ servicesRouter.post('/admin/services/:id/:action', asyncHandler(async (req, res)
 }));
 
 // Cluster-Gesundheit (Nodes / Pods / Namespaces) fuer den Admin-Bereich.
-servicesRouter.get('/admin/cluster', asyncHandler(async (_req, res) => {
+servicesRouter.get('/admin/cluster', adminAuth, asyncHandler(async (_req, res) => {
   res.json(await getClusterSummary());
 }));

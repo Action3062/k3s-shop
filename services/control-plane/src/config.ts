@@ -7,6 +7,9 @@ const schema = z.object({
   DATABASE_URL: z.string(),
   CP_SERVICE_TOKEN: z.string().min(1),
 
+  CP_ADMIN_TOKEN: z.string().optional(),
+  STOREFRONT_ASSERT_SECRET: z.string().optional(),
+
   APPS_BASE_DOMAIN: z.string().default('meinappnest.org'),
   STOREFRONT_URL: z.string().default('https://store.meinappnest.org'),
   DEPROVISION_GRACE_DAYS: z.coerce.number().default(14),

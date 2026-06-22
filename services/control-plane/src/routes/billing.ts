@@ -5,7 +5,7 @@ import { config } from '../config';
 import { requireStripe } from '../stripe';
 import { ApiError } from '../lib/errors';
 import { asyncHandler } from '../lib/asyncHandler';
-import { customerContext } from '../middleware/auth';
+import { customerAssertion } from '../middleware/auth';
 
 export const billingRouter = Router();
 
@@ -13,7 +13,7 @@ const checkoutBody = z.object({ planId: z.string().min(1) });
 
 billingRouter.post(
   '/checkout/session',
-  customerContext,
+  customerAssertion,
   asyncHandler(async (req, res) => {
     const customerId = (req as { customerId?: string }).customerId!;
     const { planId } = checkoutBody.parse(req.body);
@@ -39,7 +39,7 @@ billingRouter.post(
 
 billingRouter.post(
   '/portal/session',
-  customerContext,
+  customerAssertion,
   asyncHandler(async (req, res) => {
     const customerId = (req as { customerId?: string }).customerId!;
     const customer = await prisma.customer.findUnique({ where: { id: customerId } });
